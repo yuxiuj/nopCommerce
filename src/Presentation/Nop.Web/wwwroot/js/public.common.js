@@ -127,7 +127,9 @@ function displayBarNotification(message, messagetype, timeout) {
 
     //add new notifications
     var htmlcode = document.createElement('div');
-    htmlcode.classList.add('bar-notification', cssclass);
+    //IE11 Does not support multiple parameters for the add() & remove() methods
+    htmlcode.classList.add('bar-notification');
+    htmlcode.classList.add(cssclass);
 
     //add close button for notification
     var close = document.createElement('span');
@@ -139,10 +141,10 @@ function displayBarNotification(message, messagetype, timeout) {
         content.classList.add('content');
         content.innerHTML = messages[i];
 
-        htmlcode.append(content);
+        htmlcode.appendChild(content);
     }
     
-    htmlcode.append(close);
+    htmlcode.appendChild(close);
 
     $('#bar-notification')
         .append(htmlcode);
@@ -155,7 +157,7 @@ function displayBarNotification(message, messagetype, timeout) {
 
     //callback for notification removing
     var removeNoteItem = function () {
-        htmlcode.remove();
+        $(htmlcode).remove();
     };
 
     $(close).on('click', function () {
