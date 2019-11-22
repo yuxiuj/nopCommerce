@@ -127,6 +127,20 @@
         /// </summary>
         public static string OldFaviconIconName => "favicon-{0}.ico";
 
+        #endregion Localization client-side validation
+
+        /// <summary>
+        /// Gets a path to the localization client-side validation 
+        /// </summary>
+        public static string LocalePatternPath => "lib\\cldr-data\\main\\{0}";
+
+        /// <summary>
+        /// Gets a name of the archive with localization of templates
+        /// </summary>
+        public static string LocalePatternArchiveName => "main.zip";
+
+        #region
+
         #endregion
 
         #region nopCommerce official site

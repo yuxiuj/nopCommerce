@@ -1615,6 +1615,24 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        public virtual IActionResult UploadLocalePattern()
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
+                return AccessDeniedView();
+
+            try
+            {
+                _uploadService.UploadLocalePattern();
+            }
+            catch (Exception exc)
+            {
+                _notificationService.ErrorNotification(exc);
+            }
+
+            return RedirectToAction("GeneralCommon");
+        }
+
+        [HttpPost]
         public virtual IActionResult UploadIconsArchive(IFormFile archivefile)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
