@@ -1,24 +1,47 @@
-﻿using System.Linq;
+﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Nop.Core.Domain.Customers;
 using Nop.Data;
+using Nop.Services.Catalog;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Security;
+using Nop.Core.Domain.Catalog;
 
 namespace Nop.Web.Controllers
 {
     public partial class HomeController : BasePublicController
     {
-        public HomeController(IRepository<Customer> cRepository, IRepository<CustomerPassword> cpRepository)
+        protected static Random _random = new Random();
+
+        public HomeController(IRepository<Product> pRepository, IProductService productService)
         {
-            var query = from c in cRepository.Table
-                join cp in cpRepository.Table on c.Id equals cp.CustomerId
-                where cp.PasswordSalt == "qXIzFdY="
-                select c;
+            var products = productService.GetAllProductsDisplayedOnHomepage();
+            
+            var product = products[_random.Next() % products.Count];
 
-            var key = query.Expression.ToString();
+            var oldName = product.Name;
+            var oldShortDescription = product.ShortDescription;
+            var oldFullDescription = product.FullDescription;
 
-            key.ToUpper();
+            // load from DB
+            var dbProduct = pRepository.GetById(product.Id);
+
+            dbProduct.Name = dbProduct.ShortDescription = dbProduct.FullDescription = "Test";
+
+            pRepository.Update(dbProduct, false);
+
+            var rezM = product.FullDescription == dbProduct.FullDescription;
+
+            pRepository.Update(dbProduct, true);
+
+            var rezR = product.FullDescription == dbProduct.FullDescription;
+
+            dbProduct.Name = oldName;
+            dbProduct.ShortDescription = oldShortDescription;
+            dbProduct.FullDescription = oldFullDescription;
+
+            pRepository.Update(dbProduct);
+
+            throw new Exception($"FullDescription updated by method: {rezM}, FullDescription updated by reflaction: {rezR}");
         }
 
         [HttpsRequirement(SslRequirement.No)]

@@ -90,12 +90,14 @@ namespace Nop.Data
         /// Update entity
         /// </summary>
         /// <param name="entity">Entity</param>
-        public virtual void Update(TEntity entity)
+        public virtual void Update(TEntity entity, bool useReflaction = true)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
             _dataConnection.Update(entity);
+
+            entity.Update(this, entity, useReflaction);
         }
 
         /// <summary>

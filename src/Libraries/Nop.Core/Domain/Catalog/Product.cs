@@ -618,5 +618,19 @@ namespace Nop.Core.Domain.Catalog
             get => (RentalPricePeriod)RentalPricePeriodId;
             set => RentalPricePeriodId = (int)value;
         }
+
+        public override void UpdateByMethod(object sender, BaseEntity newEntity)
+        {
+            if(!(newEntity is Product entity))
+                return;
+
+            if(Id != entity.Id)
+                return;
+
+            Name = entity.Name;
+            ShortDescription = entity.ShortDescription;
+
+            // so on and so forth
+        }
     }
 }

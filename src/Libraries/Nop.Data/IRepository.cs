@@ -35,7 +35,7 @@ namespace Nop.Data
         /// Update entity
         /// </summary>
         /// <param name="entity">Entity</param>
-        void Update(TEntity entity);
+        void Update(TEntity entity, bool useReflaction = true);
 
         /// <summary>
         /// Update entities

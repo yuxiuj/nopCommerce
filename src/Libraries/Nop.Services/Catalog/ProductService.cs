@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nop.Core;
 using Nop.Core.Caching;
+using Nop.Core.Caching.Extensions;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
@@ -354,7 +355,7 @@ namespace Nop.Services.Catalog
                         !p.Deleted &&
                         p.ShowOnHomepage
                         select p;
-            var products = query.ToList();
+            var products = query.ToCachedList();
             return products;
         }
 
