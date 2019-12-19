@@ -173,6 +173,33 @@ set @resources='
         ]]>
     </Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.SubmitButton">
+    <Value>Return to stock</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.SubmitButton.ItemsAlreadyReturned">
+    <Value>Already returned</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.InvalidQuantity">
+    <Value>Quantity of the return request items should be more 0 and less or equal {0}.</Value>
+  </LocaleResource>  
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.ItemsAlreadyReturned">
+    <Value>Items are already returned to stock.</Value>
+  </LocaleResource> 
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.Succeeded">
+    <Value>Successful return of item(s) to stock.</Value>
+  </LocaleResource> 
+  <LocaleResource Name="Admin.StockQuantityHistory.Messages.ReturnToStock">
+    <Value>The stock quantity has been increased by processing the return request #{0}</Value>
+  </LocaleResource> 
+  <LocaleResource Name="Admin.ReturnRequests.Fields.ItemsReturned">
+    <Value>Returned to stock</Value>
+  </LocaleResource> 
+  <LocaleResource Name="Admin.ReturnRequests.Fields.ItemsReturned.Hint">
+    <Value>Are items returned to stock?</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.Hint1">
+    <Value>to</Value>
+  </LocaleResource>
 </Language>
 '
 
@@ -285,4 +312,20 @@ BEGIN
 	ALTER TABLE [StorePickupPoint] ADD
 	Longitude decimal(18, 8) NULL
 END
+
+--new column
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id=object_id('[ReturnRequest]') and NAME='ItemsReturned')
+BEGIN
+	ALTER TABLE [ReturnRequest] ADD
+    ItemsReturned bit NULL
+END
+GO
+
+UPDATE [ReturnRequest]
+SET [ItemsReturned] = 0
+WHERE [ItemsReturned] IS NULL
+GO
+
+ALTER TABLE [ReturnRequest]
+ALTER COLUMN [ItemsReturned] bit NOT NULL
 GO

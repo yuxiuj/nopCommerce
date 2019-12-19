@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Domain.Orders;
+using Nop.Services.Catalog;
 using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
@@ -30,6 +32,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IReturnRequestModelFactory _returnRequestModelFactory;
         private readonly IReturnRequestService _returnRequestService;
         private readonly IWorkflowMessageService _workflowMessageService;
+        private readonly IProductService _productService;
 
         #endregion Fields
 
@@ -44,7 +47,8 @@ namespace Nop.Web.Areas.Admin.Controllers
             IPermissionService permissionService,
             IReturnRequestModelFactory returnRequestModelFactory,
             IReturnRequestService returnRequestService,
-            IWorkflowMessageService workflowMessageService)
+            IWorkflowMessageService workflowMessageService,
+            IProductService productService)
         {
             _customerActivityService = customerActivityService;
             _customerService = customerService;
@@ -56,6 +60,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _returnRequestModelFactory = returnRequestModelFactory;
             _returnRequestService = returnRequestService;
             _workflowMessageService = workflowMessageService;
+            _productService = productService;
         }
 
         #endregion
@@ -190,6 +195,75 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _notificationService.SuccessNotification(_localizationService.GetResource("Admin.ReturnRequests.Notified"));
 
             return RedirectToAction("Edit", new { id = returnRequest.Id });
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("return-to-stock")]
+        public virtual IActionResult ReturnToStock(ReturnRequestModel model, IFormCollection form)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageReturnRequests))
+                return AccessDeniedView();
+
+            //try to get a return request with the specified id
+            var returnRequest = _returnRequestService.GetReturnRequestById(model.Id);
+            if (returnRequest == null)
+                return RedirectToAction("List");
+
+            if (ModelState.IsValid)
+            {
+                if (returnRequest.ItemsReturned)
+                {
+                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.ItemsAlreadyReturned"));
+                    return RedirectToAction("Edit", new { id = returnRequest.Id });
+                }
+
+                var orderItem = _orderService.GetOrderItemById(returnRequest.OrderItemId);
+                if (orderItem == null)
+                {
+                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.ReturnRequests.OrderItemDeleted"));
+                    return RedirectToAction("Edit", new { id = returnRequest.Id });
+                }
+
+                if (model.Quantity <= 0 || model.Quantity > orderItem.Quantity)
+                {
+                    _notificationService.ErrorNotification(
+                        string.Format(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.InvalidQuantity"), orderItem.Quantity));
+                    return RedirectToAction("Edit", new { id = returnRequest.Id });
+                }
+
+                returnRequest.Quantity = model.Quantity;
+                returnRequest.ItemsReturned = true;
+                returnRequest.UpdatedOnUtc = DateTime.UtcNow;
+                _customerService.UpdateCustomer(returnRequest.Customer);
+
+                var warehouseId = 0;
+                if (orderItem.Product.UseMultipleWarehouses)
+                {
+                    //multiple warehouses supported
+                    //warehouse is chosen by a store owner
+                    foreach (var formKey in form.Keys)
+                        if (formKey.Equals($"warehouse_{returnRequest.Id}", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            int.TryParse(form[formKey], out warehouseId);
+                            break;
+                        }
+                }
+                else
+                {
+                    warehouseId = orderItem.Product.WarehouseId;
+                }
+
+                var returnMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.ReturnToStock"), returnRequest.Id);
+                _productService.AdjustStockQuantity(orderItem.Product, model.Quantity, warehouseId, orderItem.AttributesXml, returnMessage);
+
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.Succeeded"));
+            }
+
+            //prepare model
+            model = _returnRequestModelFactory.PrepareReturnRequestModel(model, returnRequest, true);
+
+            //if we got this far, something failed, redisplay form
+            return View(model);
         }
 
         [HttpPost]

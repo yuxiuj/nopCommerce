@@ -63,8 +63,46 @@
                             <nop-label asp-for="Quantity" />
                         </div>
                         <div class="col-md-9">
-                            <nop-editor asp-for="Quantity" />
-                            <span asp-validation-for="Quantity"></span>
+                            <div class="input-group">
+                                <div class="pull-left margin-r-10">
+                                    <nop-editor class="pull-left margin-r-10" asp-for="Quantity" />
+                                </div>
+
+                                @if (Model.AllowReturnToStock)
+                                {
+                                    if (Model.AvailableWarehouses.Count > 0)
+                                    {
+                                        <div class="form-text-row pull-left margin-r-10">
+                                            @T("Admin.ReturnRequests.ReturnToStock.Hint1")
+                                        </div>
+                                        <div class="pull-left margin-r-10">
+                                            <select name="warehouse_@(Model.Id)" id="warehouse_@(Model.Id)" class="form-control" style="max-width:200px;">
+                                                @foreach (var warehouse in Model.AvailableWarehouses)
+                                                {
+                                                    <option value="@warehouse.WarehouseId" data-stock-qty="@warehouse.StockQuantity" data-reserved-qty="@warehouse.ReservedQuantity" data-planned-qty="@warehouse.PlannedQuantity">
+                                                        @T("Admin.Orders.Shipments.Products.Warehouse.ChooseQty", warehouse.WarehouseName, warehouse.StockQuantity, warehouse.ReservedQuantity, warehouse.PlannedQuantity)
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    }
+                                    <div class="pull-left margin-r-10">
+                                        <div class="input-group-btn">
+                                            <button type="submit" id="return-to-stock" name="return-to-stock" class="btn btn-info">
+                                                @T("Admin.ReturnRequests.ReturnToStock.SubmitButton")
+                                            </button>
+                                        </div>
+                                        <nop-action-confirmation asp-button-id="return-to-stock" />
+                                    </div>
+                                }
+                                else if (Model.ItemsReturned)
+                                {
+                                    <div class="pull-left margin-r-10" style="margin-left: 20px;">
+                                        <div class="callout bg-gray-light no-margin">@T("Admin.ReturnRequests.ReturnToStock.SubmitButton.ItemsAlreadyReturned")</div>
+                                    </div>
+                                }
+                                <span asp-validation-for="Quantity"></span>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">

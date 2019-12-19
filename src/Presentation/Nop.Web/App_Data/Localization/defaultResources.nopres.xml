@@ -13164,6 +13164,12 @@
   <LocaleResource Name="Admin.ReturnRequests.Fields.CustomOrderNumber.Hint">
     <Value>The unique number of the order.</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.Fields.ItemsReturned">
+    <Value>Returned to stock</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.Fields.ItemsReturned.Hint">
+    <Value>Are items returned to stock?</Value>
+  </LocaleResource>
   <LocaleResource Name="Admin.ReturnRequests.Fields.Product">
     <Value>Product</Value>
   </LocaleResource>
@@ -13223,6 +13229,24 @@
   </LocaleResource>
   <LocaleResource Name="Admin.ReturnRequests.OrderItemDeleted">
     <Value>Order item is deleted</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.Hint1">
+    <Value>to</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.InvalidQuantity">
+    <Value>Quantity of the return request items should be more 0 and less or equal {0}</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.ItemsAlreadyReturned">
+    <Value>Items are already returned to stock.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.SubmitButton">
+    <Value>Return to stock</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.SubmitButton.ItemsAlreadyReturned">
+    <Value>Already returned</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.ReturnRequests.ReturnToStock.Succeeded">
+    <Value>Successful return of item(s) to stock</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.ReturnRequests.SearchCustomNumber">
     <Value>ID</Value>
@@ -13469,6 +13493,9 @@
   </LocaleResource>
   <LocaleResource Name="Admin.StockQuantityHistory.Messages.PlaceOrder">
     <Value>The stock quantity has been reduced by placing the order #{0}</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.StockQuantityHistory.Messages.ReturnToStock">
+    <Value>The stock quantity has been increased by processing the return request #{0}</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.StockQuantityHistory.Messages.Ship">
     <Value>The stock quantity has been reduced when an order item of the order #{0} was shipped</Value>

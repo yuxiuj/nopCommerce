@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Orders;
+using Nop.Services.Shipping;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
-using Nop.Web.Areas.Admin.Models.Discounts;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Factories;
-using Nop.Web.Framework.Models.DataTables;
 using Nop.Web.Framework.Models.Extensions;
 
 namespace Nop.Web.Areas.Admin.Factories
@@ -31,6 +30,7 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ILocalizedModelFactory _localizedModelFactory;
         private readonly IOrderService _orderService;
         private readonly IReturnRequestService _returnRequestService;
+        private readonly IShipmentService _shipmentService;
 
         #endregion
 
@@ -42,7 +42,8 @@ namespace Nop.Web.Areas.Admin.Factories
             ILocalizationService localizationService,
             ILocalizedModelFactory localizedModelFactory,
             IOrderService orderService,
-            IReturnRequestService returnRequestService)
+            IReturnRequestService returnRequestService,
+            IShipmentService shipmentService)
         {
             _baseAdminModelFactory = baseAdminModelFactory;
             _dateTimeHelper = dateTimeHelper;
@@ -51,6 +52,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _localizedModelFactory = localizedModelFactory;
             _orderService = orderService;
             _returnRequestService = returnRequestService;
+            _shipmentService = shipmentService;
         }
 
         #endregion
@@ -160,7 +162,9 @@ namespace Nop.Web.Areas.Admin.Factories
                 Id = returnRequest.Id,
                 CustomNumber = returnRequest.CustomNumber,
                 CustomerId = returnRequest.CustomerId,
-                Quantity = returnRequest.Quantity
+                Quantity = returnRequest.Quantity,
+                ItemsReturned = returnRequest.ItemsReturned,
+                AllowReturnToStock = !returnRequest.ItemsReturned
             };
 
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(returnRequest.CreatedOnUtc, DateTimeKind.Utc);
@@ -176,6 +180,29 @@ namespace Nop.Web.Areas.Admin.Factories
                 model.OrderId = orderItem.OrderId;
                 model.AttributeInfo = orderItem.AttributeDescription;
                 model.CustomOrderNumber = orderItem.Order.CustomOrderNumber;
+                model.AllowReturnToStock = !returnRequest.ItemsReturned && 
+                    orderItem.Product.ManageInventoryMethod != ManageInventoryMethod.DontManageStock;
+
+                if (orderItem.Product.ManageInventoryMethod == ManageInventoryMethod.ManageStock && 
+                       orderItem.Product.UseMultipleWarehouses)
+                {
+                    foreach (var pwi in orderItem.Product.ProductWarehouseInventory.OrderBy(w => w.WarehouseId).ToList())
+                    {
+                        var warehouse = pwi.Warehouse;
+                        if (warehouse != null)
+                        {
+                            model.AvailableWarehouses.Add(new ReturnRequestModel.WarehouseInfo
+                            {
+                                WarehouseId = warehouse.Id,
+                                WarehouseName = warehouse.Name,
+                                StockQuantity = pwi.StockQuantity,
+                                ReservedQuantity = pwi.ReservedQuantity,
+                                PlannedQuantity =
+                                    _shipmentService.GetQuantityInShipments(orderItem.Product, warehouse.Id, true, true)
+                            });
+                        }
+                    }
+                }
             }
 
             if (excludeProperties)

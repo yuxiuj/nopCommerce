@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Nop.Core.Domain.Customers;
 
 namespace Nop.Core.Domain.Orders
@@ -34,6 +34,11 @@ namespace Nop.Core.Domain.Orders
         public int Quantity { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the items are returned to the stock
+        /// </summary>
+        public bool ItemsReturned { get; set; }
+
+        /// <summary>
         /// Gets or sets the reason to return
         /// </summary>
         public string ReasonForReturn { get; set; }
@@ -62,7 +67,7 @@ namespace Nop.Core.Domain.Orders
         /// Gets or sets the return status identifier
         /// </summary>
         public int ReturnRequestStatusId { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the date and time of entity creation
         /// </summary>

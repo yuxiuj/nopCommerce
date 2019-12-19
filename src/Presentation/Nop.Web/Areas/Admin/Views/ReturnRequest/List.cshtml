@@ -125,7 +125,7 @@
                             new ColumnProperty(nameof(ReturnRequestModel.CustomerId))
                             {
                                 Title = T("Admin.ReturnRequests.Fields.Customer").Text,
-                                Width = "350",
+                                Width = "250",
                                 Render = new RenderCustom("renderColumnCustomerInfo")
                             },
                             new ColumnProperty(nameof(ReturnRequestModel.CustomOrderNumber))
@@ -134,6 +134,13 @@
                                 ClassName =  NopColumnClassDefaults.Button,
                                 Width = "200",
                                 Render = new RenderCustom("renderColumnOrderInfo")
+                            },
+                            new ColumnProperty(nameof(ReturnRequestModel.ItemsReturned))
+                            {
+                                Title = T("Admin.ReturnRequests.Fields.ItemsReturned").Text,
+                                Width = "200",
+                                ClassName = NopColumnClassDefaults.CenterAll,
+                                Render = new RenderBoolean()
                             },
                             new ColumnProperty(nameof(ReturnRequestModel.ReturnRequestStatusStr))
                             {

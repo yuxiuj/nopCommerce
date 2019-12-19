@@ -122,6 +122,89 @@ namespace Nop.Services.Catalog
         #region Utilities
 
         /// <summary>
+        /// Adjusts low stock activity
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <param name="quantityToChange">Quantity to increase or decrease</param>
+        /// <param name="prevStockQuantity">Previous stock quantity</param>
+        protected virtual void AdjustLowStockActivity(Product product, int quantityToChange, int prevStockQuantity)
+        {
+            if (product == null)
+                throw new ArgumentNullException(nameof(product));
+
+            //qty is reduced. check if minimum stock quantity is reached
+            if (quantityToChange < 0 && product.MinStockQuantity >= GetTotalStockQuantity(product))
+            {
+                //what should we do now? disable buy button, unpublish the product, or do nothing? check "Low stock activity" property
+                switch (product.LowStockActivity)
+                {
+                    case LowStockActivity.DisableBuyButton:
+                        product.DisableBuyButton = true;
+                        product.DisableWishlistButton = true;
+                        UpdateProduct(product);
+                        break;
+                    case LowStockActivity.Unpublish:
+                        product.Published = false;
+                        UpdateProduct(product);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            //qty is increased. product is back in stock (minimum stock quantity is reached again)?
+            if (_catalogSettings.PublishBackProductWhenCancellingOrders)
+            {
+                if (quantityToChange > 0 && prevStockQuantity <= product.MinStockQuantity && product.MinStockQuantity < GetTotalStockQuantity(product))
+                {
+                    switch (product.LowStockActivity)
+                    {
+                        case LowStockActivity.DisableBuyButton:
+                            product.DisableBuyButton = false;
+                            product.DisableWishlistButton = false;
+                            UpdateProduct(product);
+                            break;
+                        case LowStockActivity.Unpublish:
+                            product.Published = true;
+                            UpdateProduct(product);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adjusts attribute combination stock quantity
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <param name="quantity">Quantity to increase or decrease</param>
+        /// <param name="attributesXml">Attributes in XML format</param>
+        /// <param name="message">Message for the stock quantity history</param>
+        protected virtual void AdjustCombinationStockQuantity(Product product, int quantity, string attributesXml, string message = "")
+        {
+            if (product == null)
+                throw new ArgumentNullException(nameof(product));
+
+            var combination = _productAttributeParser.FindProductAttributeCombination(product, attributesXml);
+            if (combination != null)
+            {
+                combination.StockQuantity += quantity;
+                _productAttributeService.UpdateProductAttributeCombination(combination);
+
+                //quantity change history
+                AddStockQuantityHistoryEntry(product, quantity, combination.StockQuantity, message: message, combinationId: combination.Id);
+
+                //send email notification
+                if (quantity < 0 && combination.StockQuantity < combination.NotifyAdminForQuantityBelow)
+                {
+                    var workflowMessageService = EngineContext.Current.Resolve<IWorkflowMessageService>();
+                    workflowMessageService.SendQuantityBelowStoreOwnerNotification(combination, _localizationSettings.DefaultAdminLanguageId);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets SKU, Manufacturer part number and GTIN
         /// </summary>
         /// <param name="product">Product</param>
@@ -1365,46 +1448,7 @@ namespace Nop.Services.Catalog
                     AddStockQuantityHistoryEntry(product, quantityToChange, product.StockQuantity, product.WarehouseId, message);
                 }
 
-                //qty is reduced. check if minimum stock quantity is reached
-                if (quantityToChange < 0 && product.MinStockQuantity >= GetTotalStockQuantity(product))
-                {
-                    //what should we do now? disable buy button, unpublish the product, or do nothing? check "Low stock activity" property
-                    switch (product.LowStockActivity)
-                    {
-                        case LowStockActivity.DisableBuyButton:
-                            product.DisableBuyButton = true;
-                            product.DisableWishlistButton = true;
-                            UpdateProduct(product);
-                            break;
-                        case LowStockActivity.Unpublish:
-                            product.Published = false;
-                            UpdateProduct(product);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                //qty is increased. product is back in stock (minimum stock quantity is reached again)?
-                if (_catalogSettings.PublishBackProductWhenCancellingOrders)
-                {
-                    if (quantityToChange > 0 && prevStockQuantity <= product.MinStockQuantity && product.MinStockQuantity < GetTotalStockQuantity(product))
-                    {
-                        switch (product.LowStockActivity)
-                        {
-                            case LowStockActivity.DisableBuyButton:
-                                product.DisableBuyButton = false;
-                                product.DisableWishlistButton = false;
-                                UpdateProduct(product);
-                                break;
-                            case LowStockActivity.Unpublish:
-                                product.Published = true;
-                                UpdateProduct(product);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
+                AdjustLowStockActivity(product, quantityToChange, prevStockQuantity);
 
                 //send email notification
                 if (quantityToChange < 0 && GetTotalStockQuantity(product) < product.NotifyAdminForQuantityBelow)
@@ -1416,22 +1460,7 @@ namespace Nop.Services.Catalog
 
             if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStockByAttributes)
             {
-                var combination = _productAttributeParser.FindProductAttributeCombination(product, attributesXml);
-                if (combination != null)
-                {
-                    combination.StockQuantity += quantityToChange;
-                    _productAttributeService.UpdateProductAttributeCombination(combination);
-
-                    //quantity change history
-                    AddStockQuantityHistoryEntry(product, quantityToChange, combination.StockQuantity, message: message, combinationId: combination.Id);
-
-                    //send email notification
-                    if (quantityToChange < 0 && combination.StockQuantity < combination.NotifyAdminForQuantityBelow)
-                    {
-                        var workflowMessageService = EngineContext.Current.Resolve<IWorkflowMessageService>();
-                        workflowMessageService.SendQuantityBelowStoreOwnerNotification(combination, _localizationSettings.DefaultAdminLanguageId);
-                    }
-                }
+                AdjustCombinationStockQuantity(product, quantityToChange, attributesXml, message);
             }
 
             //bundled products
@@ -1461,6 +1490,78 @@ namespace Nop.Services.Catalog
             //{
             //    //_backInStockSubscriptionService.SendNotificationsToSubscribers(product);
             //}
+        }
+
+        /// <summary>
+        /// Adjust stock quantity
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <param name="quantityToChange">Quantity to increase or decrease</param>
+        /// <param name="warehouseId">Warehouse identifier</param>
+        /// <param name="attributesXml">Attributes in XML format</param>
+        /// <param name="message">Message for the stock quantity history</param>
+        public virtual void AdjustStockQuantity(Product product, int quantityToChange, int warehouseId = 0, string attributesXml = "", string message = "")
+        {
+            if (product == null)
+                throw new ArgumentNullException(nameof(product));
+
+            if (quantityToChange == 0)
+                return;
+
+            if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
+            {
+                var prevStockQuantity = GetTotalStockQuantity(product);
+
+                if (product.UseMultipleWarehouses)
+                {
+                    var pwi = product.ProductWarehouseInventory
+                        .FirstOrDefault(i => warehouseId == 0 || i.WarehouseId == warehouseId);
+                    
+                    if (pwi != null)
+                    {
+                        pwi.StockQuantity += quantityToChange;
+                        AddStockQuantityHistoryEntry(product, quantityToChange, pwi.StockQuantity, warehouseId, message);
+                    }
+                }
+                else
+                {
+                    //do not use multiple warehouses
+                    //simple inventory management
+                    product.StockQuantity += quantityToChange;
+                    AddStockQuantityHistoryEntry(product, quantityToChange, product.StockQuantity, warehouseId, message);
+                }
+
+                UpdateProduct(product);
+
+                AdjustLowStockActivity(product, quantityToChange, prevStockQuantity);
+
+                //send email notification
+                if (quantityToChange < 0 && GetTotalStockQuantity(product) < product.NotifyAdminForQuantityBelow)
+                {
+                    var workflowMessageService = EngineContext.Current.Resolve<IWorkflowMessageService>();
+                    workflowMessageService.SendQuantityBelowStoreOwnerNotification(product, _localizationSettings.DefaultAdminLanguageId);
+                }
+            }
+
+            if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStockByAttributes)
+            {
+                AdjustCombinationStockQuantity(product, quantityToChange, attributesXml, message);
+            }
+
+            //bundled products
+            var attributeValues = _productAttributeParser.ParseProductAttributeValues(attributesXml);
+            foreach (var attributeValue in attributeValues)
+            {
+                if (attributeValue.AttributeValueType != AttributeValueType.AssociatedToProduct)
+                    continue;
+
+                //associated product (bundle)
+                var associatedProduct = GetProductById(attributeValue.AssociatedProductId);
+                if (associatedProduct != null)
+                {
+                    AdjustStockQuantity(associatedProduct, quantityToChange * attributeValue.Quantity, warehouseId: warehouseId, message: message);
+                }
+            }
         }
 
         /// <summary>

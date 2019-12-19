@@ -393,6 +393,16 @@ namespace Nop.Services.Catalog
         void AdjustInventory(Product product, int quantityToChange, string attributesXml = "", string message = "");
 
         /// <summary>
+        /// Adjust stock quantity
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <param name="quantityToChange">Quantity to increase or decrease</param>
+        /// <param name="warehouseId">Warehouse identifier</param>
+        /// <param name="attributesXml">Attributes in XML format</param>
+        /// <param name="message">Message for the stock quantity history</param>
+        void AdjustStockQuantity(Product product, int quantityToChange, int warehouseId = 0, string attributesXml = "", string message = "");
+
+        /// <summary>
         /// Reserve the given quantity in the warehouses.
         /// </summary>
         /// <param name="product">Product</param>

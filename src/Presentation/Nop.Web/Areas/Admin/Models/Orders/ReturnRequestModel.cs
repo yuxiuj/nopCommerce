@@ -1,6 +1,7 @@
 ﻿using System;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Models;
+using System.Collections.Generic;
 
 namespace Nop.Web.Areas.Admin.Models.Orders
 {
@@ -9,6 +10,15 @@ namespace Nop.Web.Areas.Admin.Models.Orders
     /// </summary>
     public partial class ReturnRequestModel : BaseNopEntityModel
     {
+        #region Ctor
+
+        public ReturnRequestModel()
+        {
+            AvailableWarehouses = new List<WarehouseInfo>();
+        }
+
+        #endregion
+
         #region Properties
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.CustomNumber")]
@@ -34,7 +44,10 @@ namespace Nop.Web.Areas.Admin.Models.Orders
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.Quantity")]
         public int Quantity { get; set; }
-        
+
+        [NopResourceDisplayName("Admin.ReturnRequests.Fields.ItemsReturned")]
+        public bool ItemsReturned { get; set; }
+
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.ReasonForReturn")]
         public string ReasonForReturn { get; set; }
         
@@ -58,6 +71,23 @@ namespace Nop.Web.Areas.Admin.Models.Orders
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.CreatedOn")]
         public DateTime CreatedOn { get; set; }
+
+        public bool AllowReturnToStock { get; set; }
+
+        public List<WarehouseInfo> AvailableWarehouses { get; set; }
+
+        #endregion
+
+        #region Nested Classes
+
+        public class WarehouseInfo : BaseNopModel
+        {
+            public int WarehouseId { get; set; }
+            public string WarehouseName { get; set; }
+            public int StockQuantity { get; set; }
+            public int ReservedQuantity { get; set; }
+            public int PlannedQuantity { get; set; }
+        }
 
         #endregion
     }
