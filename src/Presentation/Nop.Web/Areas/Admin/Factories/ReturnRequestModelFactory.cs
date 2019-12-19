@@ -163,8 +163,7 @@ namespace Nop.Web.Areas.Admin.Factories
                 CustomNumber = returnRequest.CustomNumber,
                 CustomerId = returnRequest.CustomerId,
                 Quantity = returnRequest.Quantity,
-                ItemsReturned = returnRequest.ItemsReturned,
-                AllowReturnToStock = !returnRequest.ItemsReturned
+                ItemsReturned = returnRequest.ItemsReturned
             };
 
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(returnRequest.CreatedOnUtc, DateTimeKind.Utc);

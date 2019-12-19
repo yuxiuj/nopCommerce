@@ -209,61 +209,54 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (returnRequest == null)
                 return RedirectToAction("List");
 
-            if (ModelState.IsValid)
+            if (returnRequest.ItemsReturned)
             {
-                if (returnRequest.ItemsReturned)
-                {
-                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.ItemsAlreadyReturned"));
-                    return RedirectToAction("Edit", new { id = returnRequest.Id });
-                }
-
-                var orderItem = _orderService.GetOrderItemById(returnRequest.OrderItemId);
-                if (orderItem == null)
-                {
-                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.ReturnRequests.OrderItemDeleted"));
-                    return RedirectToAction("Edit", new { id = returnRequest.Id });
-                }
-
-                if (model.Quantity <= 0 || model.Quantity > orderItem.Quantity)
-                {
-                    _notificationService.ErrorNotification(
-                        string.Format(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.InvalidQuantity"), orderItem.Quantity));
-                    return RedirectToAction("Edit", new { id = returnRequest.Id });
-                }
-
-                returnRequest.Quantity = model.Quantity;
-                returnRequest.ItemsReturned = true;
-                returnRequest.UpdatedOnUtc = DateTime.UtcNow;
-                _customerService.UpdateCustomer(returnRequest.Customer);
-
-                var warehouseId = 0;
-                if (orderItem.Product.UseMultipleWarehouses)
-                {
-                    //multiple warehouses supported
-                    //warehouse is chosen by a store owner
-                    foreach (var formKey in form.Keys)
-                        if (formKey.Equals($"warehouse_{returnRequest.Id}", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            int.TryParse(form[formKey], out warehouseId);
-                            break;
-                        }
-                }
-                else
-                {
-                    warehouseId = orderItem.Product.WarehouseId;
-                }
-
-                var returnMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.ReturnToStock"), returnRequest.Id);
-                _productService.AdjustStockQuantity(orderItem.Product, model.Quantity, warehouseId, orderItem.AttributesXml, returnMessage);
-
-                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.Succeeded"));
+                _notificationService.ErrorNotification(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.ItemsAlreadyReturned"));
+                return RedirectToAction("Edit", new { id = returnRequest.Id });
             }
 
-            //prepare model
-            model = _returnRequestModelFactory.PrepareReturnRequestModel(model, returnRequest, true);
+            var orderItem = _orderService.GetOrderItemById(returnRequest.OrderItemId);
+            if (orderItem == null)
+            {
+                _notificationService.ErrorNotification(_localizationService.GetResource("Admin.ReturnRequests.OrderItemDeleted"));
+                return RedirectToAction("Edit", new { id = returnRequest.Id });
+            }
 
-            //if we got this far, something failed, redisplay form
-            return View(model);
+            if (model.Quantity <= 0 || model.Quantity > orderItem.Quantity)
+            {
+                _notificationService.ErrorNotification(
+                    string.Format(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.InvalidQuantity"), orderItem.Quantity));
+                return RedirectToAction("Edit", new { id = returnRequest.Id });
+            }
+
+            returnRequest.Quantity = model.Quantity;
+            returnRequest.ItemsReturned = true;
+            returnRequest.UpdatedOnUtc = DateTime.UtcNow;
+            _customerService.UpdateCustomer(returnRequest.Customer);
+
+            var warehouseId = 0;
+            if (orderItem.Product.UseMultipleWarehouses)
+            {
+                //multiple warehouses supported
+                //warehouse is chosen by a store owner
+                foreach (var formKey in form.Keys)
+                    if (formKey.Equals($"warehouse_{returnRequest.Id}", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        int.TryParse(form[formKey], out warehouseId);
+                        break;
+                    }
+            }
+            else
+            {
+                warehouseId = orderItem.Product.WarehouseId;
+            }
+
+            var returnMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.ReturnToStock"), returnRequest.Id);
+            _productService.AdjustStockQuantity(orderItem.Product, model.Quantity, warehouseId, orderItem.AttributesXml, returnMessage);
+
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.Succeeded"));
+
+            return RedirectToAction("Edit", new { id = returnRequest.Id });
         }
 
         [HttpPost]
