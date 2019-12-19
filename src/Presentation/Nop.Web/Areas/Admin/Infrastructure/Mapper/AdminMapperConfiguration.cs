@@ -1297,7 +1297,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.AttributeInfo, options => options.Ignore())
                 .ForMember(model => model.CustomOrderNumber, options => options.Ignore())
                 .ForMember(model => model.UploadedFileGuid, options => options.Ignore())
-                .ForMember(model => model.ReturnRequestStatusStr, options => options.Ignore());
+                .ForMember(model => model.ReturnRequestStatusStr, options => options.Ignore())
+                .ForMember(model => model.AllowReturnToStock, options => options.Ignore())
+                .ForMember(model => model.AvailableWarehouses, options => options.Ignore());
             CreateMap<ReturnRequestModel, ReturnRequest>()
                 .ForMember(entity => entity.CustomNumber, options => options.Ignore())
                 .ForMember(entity => entity.StoreId, options => options.Ignore())
