@@ -222,10 +222,20 @@ namespace Nop.Web.Areas.Admin.Controllers
                 return RedirectToAction("Edit", new { id = returnRequest.Id });
             }
 
-            if (model.Quantity <= 0 || model.Quantity > orderItem.Quantity)
+            var availableQuantity = orderItem.Quantity;
+
+            var returnRequests = _returnRequestService.GetReturnRequestsByOrderItemId(orderItem.Id);
+            if (returnRequests?.Any() == true)
+            {
+                var returnedQuantity = returnRequests.Where(rr => rr.ItemsReturned && rr.Id != returnRequest.Id).Sum(rr => rr.Quantity);
+                if (returnedQuantity < orderItem.Quantity)
+                    availableQuantity = orderItem.Quantity - returnedQuantity;
+            }
+
+            if (model.Quantity <= 0 || model.Quantity > availableQuantity)
             {
                 _notificationService.ErrorNotification(
-                    string.Format(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.InvalidQuantity"), orderItem.Quantity));
+                    string.Format(_localizationService.GetResource("Admin.ReturnRequests.ReturnToStock.InvalidQuantity"), availableQuantity));
                 return RedirectToAction("Edit", new { id = returnRequest.Id });
             }
 
@@ -247,9 +257,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     }
             }
             else
-            {
                 warehouseId = orderItem.Product.WarehouseId;
-            }
 
             var returnMessage = string.Format(_localizationService.GetResource("Admin.StockQuantityHistory.Messages.ReturnToStock"), returnRequest.Id);
             _productService.AdjustStockQuantity(orderItem.Product, model.Quantity, warehouseId, orderItem.AttributesXml, returnMessage);

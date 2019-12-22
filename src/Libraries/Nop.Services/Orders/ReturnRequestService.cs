@@ -80,11 +80,30 @@ namespace Nop.Services.Orders
             if (orderId == 0)
                 return null;
 
-            var query = from o in _orderItemRepository.Table
-                        join r in _returnRequestRepository.Table on o.Id equals r.OrderItemId
-                        where o.OrderId == orderId
-                        orderby r.Id
-                        select r;
+            var query = from oi in _orderItemRepository.Table
+                        join rr in _returnRequestRepository.Table on oi.Id equals rr.OrderItemId
+                        where oi.OrderId == orderId
+                        orderby rr.Id
+                        select rr;
+
+            return query.ToList();
+        }
+
+        /// <summary>
+        /// Gets a return requests
+        /// </summary>
+        /// <param name="orderItemId">Order item identifier</param>
+        /// <returns></returns>
+        public virtual IList<ReturnRequest> GetReturnRequestsByOrderItemId(int orderItemId)
+        {
+            if (orderItemId == 0)
+                return null;
+
+            var query = from oi in _orderItemRepository.Table
+                        join rr in _returnRequestRepository.Table on oi.Id equals rr.OrderItemId
+                        where oi.Id == orderItemId
+                        orderby rr.Id
+                        select rr;
 
             return query.ToList();
         }

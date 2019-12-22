@@ -24,11 +24,18 @@ namespace Nop.Services.Orders
         ReturnRequest GetReturnRequestById(int returnRequestId);
 
         /// <summary>
-        /// Gets a return request
+        /// Gets a return requests
         /// </summary>
         /// <param name="returnRequestId">Order identifier</param>
         /// <returns>Return request</returns>
         IList<ReturnRequest> GetReturnRequestsByOrderId(int orderId);
+
+        /// <summary>
+        /// Gets a return requests
+        /// </summary>
+        /// <param name="orderItemId">Order item identifier</param>
+        /// <returns></returns>
+        IList<ReturnRequest> GetReturnRequestsByOrderItemId(int orderItemId);
 
         /// <summary>
         /// Search return requests
