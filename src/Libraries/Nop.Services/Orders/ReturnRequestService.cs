@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nop.Core;
@@ -16,6 +16,7 @@ namespace Nop.Services.Orders
         #region Fields
 
         private readonly IEventPublisher _eventPublisher;
+        private readonly IRepository<OrderItem> _orderItemRepository;
         private readonly IRepository<ReturnRequest> _returnRequestRepository;
         private readonly IRepository<ReturnRequestAction> _returnRequestActionRepository;
         private readonly IRepository<ReturnRequestReason> _returnRequestReasonRepository;
@@ -25,11 +26,13 @@ namespace Nop.Services.Orders
         #region Ctor
 
         public ReturnRequestService(IEventPublisher eventPublisher,
+            IRepository<OrderItem> orderItemRepository,
             IRepository<ReturnRequest> returnRequestRepository,
             IRepository<ReturnRequestAction> returnRequestActionRepository,
             IRepository<ReturnRequestReason> returnRequestReasonRepository)
         {
             _eventPublisher = eventPublisher;
+            _orderItemRepository = orderItemRepository;
             _returnRequestRepository = returnRequestRepository;
             _returnRequestActionRepository = returnRequestActionRepository;
             _returnRequestReasonRepository = returnRequestReasonRepository;
@@ -65,6 +68,25 @@ namespace Nop.Services.Orders
                 return null;
 
             return _returnRequestRepository.GetById(returnRequestId);
+        }
+
+        /// <summary>
+        /// Gets a return request
+        /// </summary>
+        /// <param name="returnRequestId">Order identifier</param>
+        /// <returns>Return request</returns>
+        public virtual IList<ReturnRequest> GetReturnRequestsByOrderId(int orderId)
+        {
+            if (orderId == 0)
+                return null;
+
+            var query = from o in _orderItemRepository.Table
+                        join r in _returnRequestRepository.Table on o.Id equals r.OrderItemId
+                        where o.OrderId == orderId
+                        orderby r.Id
+                        select r;
+
+            return query.ToList();
         }
 
         /// <summary>

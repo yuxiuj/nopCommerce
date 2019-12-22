@@ -66,6 +66,7 @@ namespace Nop.Services.Orders
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IProductService _productService;
+        private readonly IReturnRequestService _returnRequestService;
         private readonly IRewardPointService _rewardPointService;
         private readonly IShipmentService _shipmentService;
         private readonly IShippingPluginManager _shippingPluginManager;
@@ -115,6 +116,7 @@ namespace Nop.Services.Orders
             IProductAttributeFormatter productAttributeFormatter,
             IProductAttributeParser productAttributeParser,
             IProductService productService,
+            IReturnRequestService returnRequestService,
             IRewardPointService rewardPointService,
             IShipmentService shipmentService,
             IShippingPluginManager shippingPluginManager,
@@ -160,6 +162,7 @@ namespace Nop.Services.Orders
             _productAttributeFormatter = productAttributeFormatter;
             _productAttributeParser = productAttributeParser;
             _productService = productService;
+            _returnRequestService = returnRequestService;
             _rewardPointService = rewardPointService;
             _shipmentService = shipmentService;
             _shippingPluginManager = shippingPluginManager;
@@ -3004,8 +3007,24 @@ namespace Nop.Services.Orders
             if (daysPassed >= _orderSettings.NumberOfDaysReturnRequestAvailable)
                 return false;
 
+            var allowedOrderItems = new List<OrderItem>();
+
+            var returnRequests = _returnRequestService.GetReturnRequestsByOrderId(order.Id);
+            if (returnRequests?.Any() == true)
+            {
+                // check if all items are returned in order.
+                foreach (var orderItem in order.OrderItems)
+                {
+                    var returnRequestsByOrderItem = returnRequests.Where(rr => rr.OrderItemId == orderItem.Id);
+                    if (returnRequestsByOrderItem?.Sum(rr => rr.Quantity) < orderItem.Quantity)
+                        allowedOrderItems.Add(orderItem);
+                }
+            }
+            else
+                allowedOrderItems.AddRange(order.OrderItems);
+
             //ensure that we have at least one returnable product
-            return order.OrderItems.Any(oi => !oi.Product.NotReturnable);
+            return allowedOrderItems.Any(oi => !oi.Product.NotReturnable);
         }
 
         /// <summary>

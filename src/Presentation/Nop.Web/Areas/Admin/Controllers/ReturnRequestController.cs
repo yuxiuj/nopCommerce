@@ -29,10 +29,10 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly INotificationService _notificationService;
         private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
+        private readonly IProductService _productService;
         private readonly IReturnRequestModelFactory _returnRequestModelFactory;
         private readonly IReturnRequestService _returnRequestService;
         private readonly IWorkflowMessageService _workflowMessageService;
-        private readonly IProductService _productService;
 
         #endregion Fields
 
@@ -45,10 +45,10 @@ namespace Nop.Web.Areas.Admin.Controllers
             INotificationService notificationService,
             IOrderService orderService,
             IPermissionService permissionService,
+            IProductService productService,
             IReturnRequestModelFactory returnRequestModelFactory,
             IReturnRequestService returnRequestService,
-            IWorkflowMessageService workflowMessageService,
-            IProductService productService)
+            IWorkflowMessageService workflowMessageService)
         {
             _customerActivityService = customerActivityService;
             _customerService = customerService;

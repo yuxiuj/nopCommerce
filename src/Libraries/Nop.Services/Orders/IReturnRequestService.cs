@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
@@ -22,6 +22,13 @@ namespace Nop.Services.Orders
         /// <param name="returnRequestId">Return request identifier</param>
         /// <returns>Return request</returns>
         ReturnRequest GetReturnRequestById(int returnRequestId);
+
+        /// <summary>
+        /// Gets a return request
+        /// </summary>
+        /// <param name="returnRequestId">Order identifier</param>
+        /// <returns>Return request</returns>
+        IList<ReturnRequest> GetReturnRequestsByOrderId(int orderId);
 
         /// <summary>
         /// Search return requests

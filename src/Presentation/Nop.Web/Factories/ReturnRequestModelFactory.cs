@@ -158,11 +158,24 @@ namespace Nop.Web.Factories
                 });
 
             //returnable products
+            var returnRequests = _returnRequestService.GetReturnRequestsByOrderId(order.Id);
             var orderItems = order.OrderItems.Where(oi => !oi.Product.NotReturnable);
             foreach (var orderItem in orderItems)
             {
                 var orderItemModel = PrepareSubmitReturnRequestOrderItemModel(orderItem);
-                model.Items.Add(orderItemModel);
+
+                var returnRequestsByOrderItem = returnRequests.Where(rr => rr.OrderItemId == orderItem.Id);
+                if (returnRequestsByOrderItem?.Any() == true)
+                {
+                    var returnedQuantity = returnRequestsByOrderItem.Sum(rr => rr.Quantity);
+                    if (returnedQuantity < orderItem.Quantity)
+                    {
+                        orderItemModel.Quantity -= returnedQuantity;
+                        model.Items.Add(orderItemModel);
+                    }
+                }
+                else
+                    model.Items.Add(orderItemModel);
             }
 
             return model;

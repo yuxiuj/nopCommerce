@@ -93,6 +93,7 @@ namespace Nop.Services.Tests.Orders
         private Mock<IVendorService> _vendorService;
         private Mock<IPdfService> _pdfService;
         private Mock<ICustomNumberFormatter> _customNumberFormatter;
+        private Mock<IReturnRequestService> _returnRequestService;
         private OrderProcessingService _orderProcessingService;
         private PaymentPluginManager _paymentPluginManager;
         private IPickupPluginManager _pickupPluginManager;
@@ -140,6 +141,7 @@ namespace Nop.Services.Tests.Orders
             _pdfService = new Mock<IPdfService>();
             _customNumberFormatter = new Mock<ICustomNumberFormatter>();
             _rewardPointService = new Mock<IRewardPointService>();
+            _returnRequestService = new Mock<IReturnRequestService>();
 
             _workContext = null;
 
@@ -284,6 +286,7 @@ namespace Nop.Services.Tests.Orders
                 _productAttributeFormatter.Object,
                 _productAttributeParser.Object,
                 _productService.Object,
+                _returnRequestService.Object,
                 _rewardPointService.Object,
                 _shipmentService.Object,
                 _shippingPluginManager,
