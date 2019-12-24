@@ -2,11 +2,13 @@
 @inject LocalizationSettings localizationSettings
 @inject CommonSettings commonSettings
 @inject IEventPublisher eventPublisher
+@inject INopFileProvider fileProvider;
 @inject Microsoft.AspNetCore.Hosting.IHostingEnvironment HostingEnvironment
 @using System.Globalization
 @using Nop.Web.Framework.UI;
 @using Nop.Core;
 @using Nop.Core.Domain.Localization
+@using Nop.Services.Common
 @inject Nop.Services.Localization.ILanguageService languageService
 @{
     //Kendo UI
@@ -18,13 +20,12 @@
     //Code to get check if current cultures scripts are exists. If not, select parent cultures scripts
     string GetDefaultLocale()
     {
-        const string localePattern = "lib\\cldr-data\\main\\{0}";
-        
-        var cultureToUse = "en"; //Default regionalisation to use
+        var localePattern = NopCommonDefaults.LocalePatternPath;        
+        var cultureToUse = NopCommonDefaults.DefaultLocalePattern; //Default regionalisation to use
 
-        if (System.IO.Directory.Exists(System.IO.Path.Combine(HostingEnvironment.WebRootPath, string.Format(localePattern, currentCulture.Name))))
+        if (fileProvider.DirectoryExists(fileProvider.Combine(HostingEnvironment.WebRootPath, string.Format(localePattern, currentCulture.Name))))
             cultureToUse = currentCulture.Name;
-        else if (System.IO.Directory.Exists(System.IO.Path.Combine(HostingEnvironment.WebRootPath, string.Format(localePattern, currentCulture.TwoLetterISOLanguageName))))
+        else if (fileProvider.DirectoryExists(fileProvider.Combine(HostingEnvironment.WebRootPath, string.Format(localePattern, currentCulture.TwoLetterISOLanguageName))))
             cultureToUse = currentCulture.TwoLetterISOLanguageName;
 
         return cultureToUse;

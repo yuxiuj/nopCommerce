@@ -1623,6 +1623,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             try
             {
                 _uploadService.UploadLocalePattern();
+                _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Configuration.Settings.GeneralCommon.LocalePattern.SuccessUpload"));
             }
             catch (Exception exc)
             {

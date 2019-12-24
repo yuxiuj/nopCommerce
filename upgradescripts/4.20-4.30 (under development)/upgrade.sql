@@ -182,6 +182,9 @@ set @resources='
   <LocaleResource Name="Admin.Configuration.Settings.GeneralCommon.Localization.Description">
     <Value><![CDATA[Sets the <a href="http://cldr.unicode.org/" target="_blank">CLDR</a> pattern for localization of client-side validation according to the current culture]]></Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.GeneralCommon.LocalePattern.SuccessUpload">
+    <Value>Localization patterns for the current culture loaded successfully.</Value>
+  </LocaleResource>
 </Language>
 '
 

@@ -127,7 +127,9 @@
         /// </summary>
         public static string OldFaviconIconName => "favicon-{0}.ico";
 
-        #endregion Localization client-side validation
+        #endregion
+
+        #region Localization client-side validation
 
         /// <summary>
         /// Gets a path to the localization client-side validation 
@@ -139,7 +141,10 @@
         /// </summary>
         public static string LocalePatternArchiveName => "main.zip";
 
-        #region
+        /// <summary>
+        /// Gets a name of the default pattern locale
+        /// </summary>
+        public static string DefaultLocalePattern => "en";
 
         #endregion
 
