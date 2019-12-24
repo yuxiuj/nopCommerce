@@ -15,7 +15,6 @@
     var kendoVersion = "2019.3.1023";
     var currentKendoCulture = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.LanguageCulture;
     var currentCulture = CultureInfo.CurrentCulture;
-    currentKendoCulture = "ru-RU"; //FOR TESTING
 
     //Code to get check if current cultures scripts are exists. If not, select parent cultures scripts
     string GetDefaultLocale()
@@ -130,7 +129,6 @@
     <body class="hold-transition skin-blue sidebar-collapse">
         <script type="text/javascript">
             var culture = "@GetDefaultLocale()";
-            culture = "ru"; //FOR TESTING
 
             //load cldr for current culture
             $.when(

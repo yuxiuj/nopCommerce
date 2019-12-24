@@ -54,8 +54,7 @@ namespace Nop.Web.Framework.Globalization
             }
             
             //set working language culture
-            //var culture = new CultureInfo(workContext.WorkingLanguage.LanguageCulture);
-            var culture = new CultureInfo("ru-RU"); //FOR TESTING
+            var culture = new CultureInfo(workContext.WorkingLanguage.LanguageCulture);
             CultureInfo.CurrentCulture = culture;
             CultureInfo.CurrentUICulture = culture;
         }
