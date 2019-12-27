@@ -1079,7 +1079,7 @@ div.dataTables_wrapper div.dataTables_processing .fa {
 .input-group.input-group-short .input-group-btn {
     width: auto;
 }
-.custom-input-group.input-group-short .bootstrap-touchspin{
+.custom-input-group.input-group-short {
     float: left;
     margin-right: 3px;
     width: 200px;
@@ -1456,52 +1456,6 @@ span.grid-report-item.red {
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px; 
-}
-
-/*bootstrap touchspin*/
-.bootstrap-touchspin {
-    max-width: 300px;
-    width: 100%;
-}
-.bootstrap-touchspin input {
-    height: auto;
-    display: table-cell !important;
-    min-height: 34px;
-}
-.bootstrap-touchspin-postfix {
-    border-left: none;
-}
-
-.input-group-btn-vertical {
-    top: 0;
-}
-
-.bootstrap-touchspin .input-group-btn-vertical i {
-    left: 6px;
-}
-.input-group-addon.bootstrap-touchspin-postfix {
-    background-color: #eee;
-    height: 34px;
-    padding-right: 30px;
-}
-.bootstrap-touchspin .input-group-btn-vertical > .btn {
-    background: #fff;
-    border-color: #d2d6de;
-    border-radius: 0;
-    height: 18px;
-    font-size: 0;
-    padding-right: 14px;
-    padding-left: 6px;
-}
-.bootstrap-touchspin .input-group-btn-vertical > .btn:before {
-    font-size: 9px;
-}
-.bootstrap-touchspin .input-group-btn-vertical > .btn:hover {
-    border-color: #afafaf;
-}
-.bootstrap-touchspin .input-group-btn-vertical .bootstrap-touchspin-down {
-    margin-top: 16px;
-    height: 17px;
 }
 
 /* THROBBER */
