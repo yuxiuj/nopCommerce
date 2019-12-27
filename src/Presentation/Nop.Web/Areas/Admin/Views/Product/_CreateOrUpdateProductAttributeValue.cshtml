@@ -161,7 +161,12 @@
                                 <div id="color-picker"></div>
                                 <script>
                                     $(document).ready(function(){
-                                        $('#color-picker').farbtastic('#@Html.IdFor(model => model.ColorSquaresRgb)');
+                                        @*$('#color-picker').farbtastic('#@Html.IdFor(model => model.ColorSquaresRgb)');*@
+                                        $('#color-picker').kendoFlatColorPicker({
+                                            preview: false,
+                                            value: '#@Html.IdFor(model => model.ColorSquaresRgb)',
+                                            change: select
+                                        });
                                     });
                                 </script>
                                 <span asp-validation-for="ColorSquaresRgb"></span>

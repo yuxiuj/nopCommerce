@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "provider": "cdnjs",
+      "library": "jquery@3.4.1",
+      "destination": "wwwroot/lib/jquery",
+      "files": [ "jquery.min.js" ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "twitter-bootstrap@3.4.1",
+      "destination": "wwwroot/lib/bootstrap",
+      "files": [
+        "css/bootstrap-theme.min.css",
+        "css/bootstrap.min.css",
+        "fonts/glyphicons-halflings-regular.eot",
+        "fonts/glyphicons-halflings-regular.svg",
+        "fonts/glyphicons-halflings-regular.ttf",
+        "fonts/glyphicons-halflings-regular.woff",
+        "fonts/glyphicons-halflings-regular.woff2",
+        "js/bootstrap.min.js"
+      ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "bootstrap-rtl@3.4.0",
+      "destination": "wwwroot/lib/bootstrap",
+      "files": [ "css/bootstrap-flipped.min.css", "css/bootstrap-rtl.min.css" ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "Chart.js@2.9.3",
+      "destination": "wwwroot/lib/chartjs",
+      "files": [ "Chart.bundle.min.js", "Chart.min.css", "Chart.min.js" ]
+    }    
+  ]
+}
