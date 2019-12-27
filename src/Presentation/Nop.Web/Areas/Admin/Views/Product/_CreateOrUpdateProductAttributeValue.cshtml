@@ -3,11 +3,6 @@
 @using Nop.Core.Domain.Catalog
 @using Nop.Services
 
-@{
-    Html.AddScriptParts("~/lib/farbtastic/farbtastic.js");
-    Html.AddCssFileParts("~/lib/farbtastic/farbtastic.css");
-}
-
 <div asp-validation-summary="All"></div>
 <input asp-for="Id" type="hidden" />
 <input asp-for="ProductAttributeMappingId" type="hidden" />
@@ -147,7 +142,7 @@
     ))
                     @if (Model.DisplayColorSquaresRgb)
                     {
-                        //ensure "ColorSquaresRgb" has some default value. Otherwise farbtastic won't set a selected value
+                        //ensure "ColorSquaresRgb" has some default value.
                         if (string.IsNullOrEmpty(Model.ColorSquaresRgb))
                         {
                             Model.ColorSquaresRgb = "#000000";
@@ -158,15 +153,9 @@
                             </div>
                             <div class="col-sm-9">
                                 <nop-editor asp-for="ColorSquaresRgb" />
-                                <div id="color-picker"></div>
                                 <script>
                                     $(document).ready(function(){
-                                        @*$('#color-picker').farbtastic('#@Html.IdFor(model => model.ColorSquaresRgb)');*@
-                                        $('#color-picker').kendoFlatColorPicker({
-                                            preview: false,
-                                            value: '#@Html.IdFor(model => model.ColorSquaresRgb)',
-                                            change: select
-                                        });
+                                        $('#@Html.IdFor(model => model.ColorSquaresRgb)').kendoColorPicker();
                                     });
                                 </script>
                                 <span asp-validation-for="ColorSquaresRgb"></span>

@@ -1,10 +1,5 @@
 @model SpecificationAttributeOptionModel
 
-@{
-    Html.AddScriptParts("~/lib/farbtastic/farbtastic.js");
-    Html.AddCssFileParts("~/lib/farbtastic/farbtastic.css");
-}
-
 <div asp-validation-summary="All"></div>
 <input asp-for="Id" type="hidden" />
 <input asp-for="SpecificationAttributeId" type="hidden" />
@@ -88,10 +83,9 @@
                         </div>
                         <div class="col-sm-9">
                             <nop-editor asp-for="ColorSquaresRgb" />
-                            <div id="color-picker"></div>
                             <script>
                                 $(document).ready(function(){
-                                    $('#color-picker').farbtastic('#@Html.IdFor(model => model.ColorSquaresRgb)');
+                                    $('#@Html.IdFor(model => model.ColorSquaresRgb)').kendoColorPicker();
                                 });
                             </script>
                             <span asp-validation-for="ColorSquaresRgb"></span>
