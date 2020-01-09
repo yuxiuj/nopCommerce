@@ -39,6 +39,19 @@
       "provider": "cdnjs",
       "library": "font-awesome@4.7.0",
       "destination": "wwwroot/lib/fontAwesome/"
-    } 
+    },
+    {
+      "provider": "cdnjs",
+      "library": "ionicons@2.0.1",
+      "destination": "wwwroot/lib/ionicons/",
+      "files": [
+        "css/ionicons.min.css",
+        "fonts/ionicons.eot",
+        "fonts/ionicons.svg",
+        "fonts/ionicons.ttf",
+        "fonts/ionicons.woff",
+        "css/ionicons.css"
+      ]
+    }
   ]
 }
