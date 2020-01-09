@@ -34,6 +34,11 @@
       "library": "Chart.js@2.9.3",
       "destination": "wwwroot/lib/chartjs",
       "files": [ "Chart.bundle.min.js", "Chart.min.css", "Chart.min.js" ]
-    }    
+    },
+    {
+      "provider": "cdnjs",
+      "library": "font-awesome@4.7.0",
+      "destination": "wwwroot/lib/fontAwesome/"
+    } 
   ]
 }
