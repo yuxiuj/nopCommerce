@@ -16,11 +16,11 @@
     @*/when jQuery migrate script logging is active you will see the log in the browser console*@
     @if (commonSettings.JqueryMigrateScriptLoggingActive)
     {
-        <script src="@Url.Content("~/lib/jquery-migrate/jquery-migrate-3.1.0.js")"></script>
+        <script src="@Url.Content("~/lib/jquery-migrate/jquery-migrate.js")"></script>
     }
     else
     {
-        <script src="@Url.Content("~/lib/jquery-migrate/jquery-migrate-3.1.0.min.js")"></script>
+        <script src="@Url.Content("~/lib/jquery-migrate/jquery-migrate.min.js")"></script>
     }
     @Html.NopInlineScripts(ResourceLocation.Head)
 </head>

@@ -52,6 +52,12 @@
         "fonts/ionicons.woff",
         "css/ionicons.css"
       ]
-    }
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery-migrate@3.1.0",
+      "destination": "wwwroot/lib/jquery-migrate/",
+      "files": ["jquery-migrate.min.js", "jquery-migrate.js"]
+    }   
   ]
 }
