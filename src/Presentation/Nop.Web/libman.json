@@ -68,6 +68,12 @@
       "provider": "cdnjs",
       "library": "jquery-validation-unobtrusive@3.2.11",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "magnific-popup.js@1.1.0",
+      "destination": "wwwroot/lib/magnific-popup/",
+      "files": [ "jquery.magnific-popup.min.js", "magnific-popup.min.css" ]
     }
   ]
 }
