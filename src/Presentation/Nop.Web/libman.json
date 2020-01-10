@@ -74,6 +74,18 @@
       "library": "magnific-popup.js@1.1.0",
       "destination": "wwwroot/lib/magnific-popup/",
       "files": [ "jquery.magnific-popup.min.js", "magnific-popup.min.css" ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "tag-editor@1.0.20",
+      "destination": "wwwroot/lib/tag-editor/",
+      "files": [ "jquery.tag-editor.min.css", "jquery.tag-editor.min.js" ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "caret@1.3.7",
+      "destination": "wwwroot/lib/tag-editor/",
+      "files": [ "jquery.caret.min.js" ]
     }
   ]
 }
