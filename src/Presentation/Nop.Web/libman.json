@@ -1,15 +1,13 @@
 {
   "version": "1.0",
-  "defaultProvider": "jsdelivr",
+  "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "provider": "cdnjs",
       "library": "jquery@3.4.1",
       "destination": "wwwroot/lib/jquery",
       "files": [ "jquery.min.js" ]
     },
     {
-      "provider": "cdnjs",
       "library": "twitter-bootstrap@3.4.1",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
@@ -24,24 +22,20 @@
       ]
     },
     {
-      "provider": "cdnjs",
       "library": "bootstrap-rtl@3.4.0",
       "destination": "wwwroot/lib/bootstrap",
       "files": [ "css/bootstrap-flipped.min.css", "css/bootstrap-rtl.min.css" ]
     },
     {
-      "provider": "cdnjs",
       "library": "Chart.js@2.9.3",
       "destination": "wwwroot/lib/chartjs",
       "files": [ "Chart.bundle.min.js", "Chart.min.css", "Chart.min.js" ]
     },
     {
-      "provider": "cdnjs",
       "library": "font-awesome@4.7.0",
       "destination": "wwwroot/lib/fontAwesome/"
     },
     {
-      "provider": "cdnjs",
       "library": "ionicons@2.0.1",
       "destination": "wwwroot/lib/ionicons/",
       "files": [
@@ -54,41 +48,34 @@
       ]
     },
     {
-      "provider": "cdnjs",
       "library": "jquery-migrate@3.1.0",
       "destination": "wwwroot/lib/jquery-migrate/",
       "files": [ "jquery-migrate.min.js", "jquery-migrate.js" ]
     },
     {
-      "provider": "cdnjs",
       "library": "jquery-validate@1.19.1",
       "destination": "wwwroot/lib/jquery-validate/"
     },
     {
-      "provider": "cdnjs",
       "library": "jquery-validation-unobtrusive@3.2.11",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
-      "provider": "cdnjs",
       "library": "magnific-popup.js@1.1.0",
       "destination": "wwwroot/lib/magnific-popup/",
       "files": [ "jquery.magnific-popup.min.js", "magnific-popup.min.css" ]
     },
     {
-      "provider": "cdnjs",
       "library": "tag-editor@1.0.20",
       "destination": "wwwroot/lib/tag-editor/",
       "files": [ "jquery.tag-editor.min.css", "jquery.tag-editor.min.js" ]
     },
     {
-      "provider": "cdnjs",
       "library": "caret@1.3.7",
       "destination": "wwwroot/lib/tag-editor/",
       "files": [ "jquery.caret.min.js" ]
     },
     {
-      "provider": "cdnjs",
       "library": "tinymce@4.9.6",
       "destination": "wwwroot/lib/tinymce4/",
       "files": [
@@ -177,7 +164,6 @@
       ]
     },
     {
-      "provider": "cdnjs",
       "library": "typeahead.js@0.11.1",
       "destination": "wwwroot/lib/typeahead/",
       "files": [ "typeahead.bundle.min.js" ]
