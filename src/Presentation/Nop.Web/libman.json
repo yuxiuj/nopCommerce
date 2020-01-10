@@ -57,7 +57,17 @@
       "provider": "cdnjs",
       "library": "jquery-migrate@3.1.0",
       "destination": "wwwroot/lib/jquery-migrate/",
-      "files": ["jquery-migrate.min.js", "jquery-migrate.js"]
-    }   
+      "files": [ "jquery-migrate.min.js", "jquery-migrate.js" ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery-validate@1.19.1",
+      "destination": "wwwroot/lib/jquery-validate/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
+    }
   ]
 }
