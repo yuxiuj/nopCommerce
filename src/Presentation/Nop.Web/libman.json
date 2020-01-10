@@ -167,6 +167,11 @@
       "library": "typeahead.js@0.11.1",
       "destination": "wwwroot/lib/typeahead/",
       "files": [ "typeahead.bundle.min.js" ]
+    },
+    {
+      "library": "moment.js@2.24.0",
+      "destination": "wwwroot/lib/moment-js/",
+      "files": ["moment-with-locales.min.js"]
     }
   ]
 }
