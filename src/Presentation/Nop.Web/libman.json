@@ -175,6 +175,12 @@
         "skins/lightgray/content.inline.min.css",
         "plugins/wordcount/plugin.min.js"
       ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "typeahead.js@0.11.1",
+      "destination": "wwwroot/lib/typeahead/",
+      "files": [ "typeahead.bundle.min.js" ]
     }
   ]
 }
