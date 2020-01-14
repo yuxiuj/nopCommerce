@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "datatables.net-bs": "1.10.20",
-    "datatables.net-buttons-bs": "2.2.0"
+    "datatables.net-buttons-bs": "2.2.0",
+    "fine-uploader": "5.16.2"
   }
 }
