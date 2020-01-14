@@ -8,7 +8,6 @@
 @inject Nop.Services.Localization.ILanguageService languageService
 @{
     var kendoVersion = "2019.2.619";
-    var jQueryUI = "1.10.3";
 
     var supportRtl = workContext.WorkingLanguage.Rtl && !localizationSettings.IgnoreRtlPropertyForAdminArea;
 
@@ -31,7 +30,7 @@
     Html.AppendCssFileParts($"~/lib/kendo/{kendoVersion}/kendo.rtl.min.css");
     Html.AppendCssFileParts($"~/lib/kendo/{kendoVersion}/kendo.default.min.css");
     Html.AppendCssFileParts($"~/lib/kendo/{kendoVersion}/kendo.common.min.css");
-    Html.AppendCssFileParts($"~/lib/jquery-ui/jquery-ui-{jQueryUI}/jquery-ui-themes/smoothness/jquery-ui-{jQueryUI}.custom.min.css");
+    Html.AppendCssFileParts("~/lib/jquery-ui/themes/smoothness/jquery-ui.min.css");
     Html.AppendCssFileParts("~/lib/fontAwesome/css/font-awesome.min.css");
     //AdminLTE Skins (choose a skin from the css/skins)
     Html.AppendCssFileParts("~/lib/adminLTE/css/skins/_all-skins.min.css");
@@ -46,7 +45,7 @@
 
     Html.AppendScriptParts("~/js/admin.common.js");
     Html.AppendScriptParts("~/lib/jquery-migrate/jquery-migrate.min.js");
-    Html.AppendScriptParts($"~/lib/jquery-ui/jquery-ui-{jQueryUI}/jquery-ui-{jQueryUI}.custom.min.js");
+    Html.AppendScriptParts("~/lib/jquery-ui/jquery-ui.min.js");
     Html.AppendScriptParts("~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
     Html.AppendScriptParts("~/lib/jquery-validate/jquery.validate.min.js");
     Html.AppendScriptParts("~/lib/adminLTE/js/adminlte.min.js");
