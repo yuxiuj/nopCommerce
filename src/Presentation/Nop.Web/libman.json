@@ -108,6 +108,11 @@
         "themes/smoothness/images/ui-icons_888888_256x240.png",
         "themes/smoothness/images/ui-icons_cd0a0a_256x240.png"
       ]
+    },
+    {
+      "library": "jsrender@1.0.5",
+      "destination": "wwwroot/lib/jsrender/",
+      "files": ["jsrender.min.js"]
     }
   ]
 }
