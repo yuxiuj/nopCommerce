@@ -32,8 +32,8 @@
       "files": [ "Chart.bundle.min.js", "Chart.min.css", "Chart.min.js" ]
     },
     {
-      "library": "font-awesome@4.7.0",
-      "destination": "wwwroot/lib/fontAwesome/"
+      "library": "font-awesome@5.12.0-1",
+      "destination": "wwwroot/lib/font-Awesome/"
     },
     {
       "library": "ionicons@2.0.1",
