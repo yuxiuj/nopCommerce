@@ -1,0 +1,95 @@
+﻿@model ProductEstimateShippingModel
+@{ 
+    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.productshipping.js");
+}
+
+<div class="product-estimate-shipping">
+    <div id="selected-shipping-option">
+        <span id="shipping-price-title">@T("Products.EstimateShipping.PriceTitle")</span><span id="shipping-price-rate"/>
+    </div>
+    <a href="#shipping-options-popup" id="open-shipping-options" data-effect="product-estimate-shipping-zoom-in"></a>
+    <input type="hidden" asp-for="ProductId" />
+    <div id="shipping-options-popup" class="white-popup mfp-with-anim mfp-hide">
+        <div class="ship-to-title">
+            <strong>@T("Products.EstimateShipping.ShipToTitle")</strong>
+        </div>
+
+        <div class="shipping-options">
+
+            <div class="estimate-shipping-row shipping-address">
+                <div class="estimate-shipping-row-item address-item">
+                    <div class="estimate-shipping-row">
+                        <select asp-for="CountryId"
+                                asp-items="Model.AvailableCountries"
+                                class="estimate-shipping-address-control"
+                                data-trigger="country-select"
+                                data-url="@(Url.RouteUrl("GetStatesByCountryId"))"
+                                data-stateprovince="#@Html.IdFor(model => model.StateProvinceId)"
+                                data-loading="#estimate-shipping-loading-progress"
+                                placeholder="@T("Products.EstimateShipping.Country")"></select>
+                        <nop-required />
+                    </div>
+                </div>
+                <div class="estimate-shipping-row-item address-item">
+                    <select asp-for="StateProvinceId"
+                            asp-items="Model.AvailableStates"
+                            class="estimate-shipping-address-control"
+                            placeholder="@T("Products.EstimateShipping.StateProvince")"></select>
+                </div>
+                <div class="estimate-shipping-row-item address-item">
+                    <div class="estimate-shipping-row">
+                        <input asp-for="ZipPostalCode"
+                               class="estimate-shipping-address-control"
+                               placeholder="@T("Products.EstimateShipping.ZipPostalCode")" />
+                        <nop-required />
+                    </div>
+                </div>
+            </div> 
+
+            <div class="choose-shipping-title">
+                <strong>@T("Products.EstimateShipping.ChooseShippingTitle")</strong>
+            </div>
+
+            <div class="shipping-methods">
+                <div class="shipping-methods-header">
+                    <div class="estimate-shipping-row">
+                        <div class="estimate-shipping-row-item-radio">
+                        </div>
+                        <div class="estimate-shipping-row-item shipping-item shipping-header-item">
+                            @T("Products.EstimateShipping.ShippingOption.Name")
+                        </div>
+                        <div class="estimate-shipping-row-item shipping-item shipping-header-item">
+                            @T("Products.EstimateShipping.ShippingOption.Description")
+                        </div>
+                        <div class="estimate-shipping-row-item shipping-item shipping-header-item">
+                            @T("Products.EstimateShipping.ShippingOption.Price")
+                        </div>
+                    </div>
+                </div>
+                <div id="shipping-methods-body">
+                    <div class="no-shipping-options">@T("Products.EstimateShipping.NoShippingOptions")</div>
+                </div>
+            </div>
+
+            <div class="estimate-shipping-button-container">
+                <input id="estimate-shipping-button" type="button" value="@T("Products.EstimateShipping.SelectShippingOption")" class="button-2 estimate-shipping-button" />
+                <div class="message-failure"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script asp-location="Footer">
+
+    $(document).ready(function () {
+        let localizedData = {
+            NoShippingOptions: '@T("Products.EstimateShipping.NoShippingOptions")',
+            NoSelectedShippingOption: '@T("Products.EstimateShipping.NoSelectedShippingOption")',
+            ToAddress: '@T("Products.EstimateShipping.ToAddress")',
+            ViaProvider: '@T("Products.EstimateShipping.ViaProvider")'
+        };
+        ProductShipping.init('#product-details-form', '@Html.Raw(Url.Action("estimateshipping", "product"))', localizedData);
+    });
+
+</script>

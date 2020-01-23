@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
@@ -10,9 +14,11 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Rss;
 using Nop.Services.Catalog;
+using Nop.Services.Directory;
 using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
@@ -37,14 +43,19 @@ namespace Nop.Web.Controllers
         private readonly CatalogSettings _catalogSettings;
         private readonly IAclService _aclService;
         private readonly ICompareProductsService _compareProductsService;
+        private readonly ICurrencyService _currencyService;
         private readonly ICustomerActivityService _customerActivityService;
+        private readonly IDownloadService _downloadService;
         private readonly IEventPublisher _eventPublisher;
         private readonly ILocalizationService _localizationService;
         private readonly IOrderService _orderService;
         private readonly IPermissionService _permissionService;
+        private readonly IProductAttributeParser _productAttributeParser;
+        private readonly IProductAttributeService _productAttributeService;
         private readonly IProductModelFactory _productModelFactory;
         private readonly IProductService _productService;
         private readonly IRecentlyViewedProductsService _recentlyViewedProductsService;
+        private readonly IShoppingCartModelFactory _shoppingCartModelFactory;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IStoreContext _storeContext;
         private readonly IStoreMappingService _storeMappingService;
@@ -63,14 +74,19 @@ namespace Nop.Web.Controllers
             CatalogSettings catalogSettings,
             IAclService aclService,
             ICompareProductsService compareProductsService,
+            ICurrencyService currencyService,
             ICustomerActivityService customerActivityService,
+            IDownloadService downloadService,
             IEventPublisher eventPublisher,
             ILocalizationService localizationService,
             IOrderService orderService,
             IPermissionService permissionService,
+            IProductAttributeParser productAttributeParser,
+            IProductAttributeService productAttributeService,
             IProductModelFactory productModelFactory,
             IProductService productService,
             IRecentlyViewedProductsService recentlyViewedProductsService,
+            IShoppingCartModelFactory shoppingCartModelFactory,
             IShoppingCartService shoppingCartService,
             IStoreContext storeContext,
             IStoreMappingService storeMappingService,
@@ -85,14 +101,19 @@ namespace Nop.Web.Controllers
             _catalogSettings = catalogSettings;
             _aclService = aclService;
             _compareProductsService = compareProductsService;
+            _currencyService = currencyService;
             _customerActivityService = customerActivityService;
+            _downloadService = downloadService;
             _eventPublisher = eventPublisher;
             _localizationService = localizationService;
             _orderService = orderService;
             _permissionService = permissionService;
+            _productAttributeParser = productAttributeParser;
+            _productAttributeService = productAttributeService;
             _productModelFactory = productModelFactory;
             _productService = productService;
             _recentlyViewedProductsService = recentlyViewedProductsService;
+            _shoppingCartModelFactory = shoppingCartModelFactory;
             _shoppingCartService = shoppingCartService;
             _storeContext = storeContext;
             _storeMappingService = storeMappingService;
@@ -102,6 +123,236 @@ namespace Nop.Web.Controllers
             _workflowMessageService = workflowMessageService;
             _localizationSettings = localizationSettings;
             _shoppingCartSettings = shoppingCartSettings;
+        }
+
+        #endregion
+
+        #region Utilities
+
+        /// <summary>
+        /// Parse product rental dates on the product details page
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <param name="form">Form</param>
+        /// <param name="startDate">Start date</param>
+        /// <param name="endDate">End date</param>
+        protected virtual void ParseRentalDates(Product product, IFormCollection form,
+            out DateTime? startDate, out DateTime? endDate)
+        {
+            startDate = null;
+            endDate = null;
+
+            var startControlId = $"rental_start_date_{product.Id}";
+            var endControlId = $"rental_end_date_{product.Id}";
+            var ctrlStartDate = form[startControlId];
+            var ctrlEndDate = form[endControlId];
+            try
+            {
+                //currently we support only this format (as in the \Views\Product\_RentalInfo.cshtml file)
+                const string datePickerFormat = "MM/dd/yyyy";
+                startDate = DateTime.ParseExact(ctrlStartDate, datePickerFormat, CultureInfo.InvariantCulture);
+                endDate = DateTime.ParseExact(ctrlEndDate, datePickerFormat, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// Parse product attributes on the product details page
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <param name="form">Form</param>
+        /// <param name="errors">Errors</param>
+        /// <returns>Parsed attributes</returns>
+        protected virtual string ParseProductAttributes(Product product, IFormCollection form, List<string> errors)
+        {
+            //product attributes
+            var attributesXml = GetProductAttributesXml(product, form, errors);
+
+            //gift cards
+            AddGiftCardsAttributesXml(product, form, ref attributesXml);
+
+            return attributesXml;
+        }
+
+        protected virtual string GetProductAttributesXml(Product product, IFormCollection form, List<string> errors)
+        {
+            var attributesXml = string.Empty;
+            var productAttributes = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+            foreach (var attribute in productAttributes)
+            {
+                var controlId = $"{NopAttributePrefixDefaults.Product}{attribute.Id}";
+                switch (attribute.AttributeControlType)
+                {
+                    case AttributeControlType.DropdownList:
+                    case AttributeControlType.RadioList:
+                    case AttributeControlType.ColorSquares:
+                    case AttributeControlType.ImageSquares:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var selectedAttributeId = int.Parse(ctrlAttributes);
+                                if (selectedAttributeId > 0)
+                                {
+                                    //get quantity entered by customer
+                                    var quantity = 1;
+                                    var quantityStr = form[$"{NopAttributePrefixDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
+                                    if (!StringValues.IsNullOrEmpty(quantityStr) &&
+                                        (!int.TryParse(quantityStr, out quantity) || quantity < 1))
+                                        errors.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));
+
+                                    attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                                        attribute, selectedAttributeId.ToString(), quantity > 1 ? (int?)quantity : null);
+                                }
+                            }
+                        }
+                        break;
+                    case AttributeControlType.Checkboxes:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                foreach (var item in ctrlAttributes.ToString()
+                                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    var selectedAttributeId = int.Parse(item);
+                                    if (selectedAttributeId > 0)
+                                    {
+                                        //get quantity entered by customer
+                                        var quantity = 1;
+                                        var quantityStr = form[$"{NopAttributePrefixDefaults.Product}{attribute.Id}_{item}_qty"];
+                                        if (!StringValues.IsNullOrEmpty(quantityStr) &&
+                                            (!int.TryParse(quantityStr, out quantity) || quantity < 1))
+                                            errors.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));
+
+                                        attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                                            attribute, selectedAttributeId.ToString(), quantity > 1 ? (int?)quantity : null);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case AttributeControlType.ReadonlyCheckboxes:
+                        {
+                            //load read-only (already server-side selected) values
+                            var attributeValues = _productAttributeService.GetProductAttributeValues(attribute.Id);
+                            foreach (var selectedAttributeId in attributeValues
+                                .Where(v => v.IsPreSelected)
+                                .Select(v => v.Id)
+                                .ToList())
+                            {
+                                //get quantity entered by customer
+                                var quantity = 1;
+                                var quantityStr = form[$"{NopAttributePrefixDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
+                                if (!StringValues.IsNullOrEmpty(quantityStr) &&
+                                    (!int.TryParse(quantityStr, out quantity) || quantity < 1))
+                                    errors.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));
+
+                                attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                                    attribute, selectedAttributeId.ToString(), quantity > 1 ? (int?)quantity : null);
+                            }
+                        }
+                        break;
+                    case AttributeControlType.TextBox:
+                    case AttributeControlType.MultilineTextbox:
+                        {
+                            var ctrlAttributes = form[controlId];
+                            if (!StringValues.IsNullOrEmpty(ctrlAttributes))
+                            {
+                                var enteredText = ctrlAttributes.ToString().Trim();
+                                attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                                    attribute, enteredText);
+                            }
+                        }
+                        break;
+                    case AttributeControlType.Datepicker:
+                        {
+                            var day = form[controlId + "_day"];
+                            var month = form[controlId + "_month"];
+                            var year = form[controlId + "_year"];
+                            DateTime? selectedDate = null;
+                            try
+                            {
+                                selectedDate = new DateTime(int.Parse(year), int.Parse(month), int.Parse(day));
+                            }
+                            catch
+                            {
+                            }
+                            if (selectedDate.HasValue)
+                            {
+                                attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                                    attribute, selectedDate.Value.ToString("D"));
+                            }
+                        }
+                        break;
+                    case AttributeControlType.FileUpload:
+                        {
+                            Guid.TryParse(form[controlId], out Guid downloadGuid);
+                            var download = _downloadService.GetDownloadByGuid(downloadGuid);
+                            if (download != null)
+                            {
+                                attributesXml = _productAttributeParser.AddProductAttribute(attributesXml,
+                                    attribute, download.DownloadGuid.ToString());
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            //validate conditional attributes (if specified)
+            foreach (var attribute in productAttributes)
+            {
+                var conditionMet = _productAttributeParser.IsConditionMet(attribute, attributesXml);
+                if (conditionMet.HasValue && !conditionMet.Value)
+                {
+                    attributesXml = _productAttributeParser.RemoveProductAttribute(attributesXml, attribute);
+                }
+            }
+            return attributesXml;
+        }
+
+        protected virtual void AddGiftCardsAttributesXml(Product product, IFormCollection form, ref string attributesXml)
+        {
+            if (!product.IsGiftCard)
+                return;
+
+            var recipientName = "";
+            var recipientEmail = "";
+            var senderName = "";
+            var senderEmail = "";
+            var giftCardMessage = "";
+            foreach (var formKey in form.Keys)
+            {
+                if (formKey.Equals($"giftcard_{product.Id}.RecipientName", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    recipientName = form[formKey];
+                    continue;
+                }
+                if (formKey.Equals($"giftcard_{product.Id}.RecipientEmail", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    recipientEmail = form[formKey];
+                    continue;
+                }
+                if (formKey.Equals($"giftcard_{product.Id}.SenderName", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    senderName = form[formKey];
+                    continue;
+                }
+                if (formKey.Equals($"giftcard_{product.Id}.SenderEmail", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    senderEmail = form[formKey];
+                    continue;
+                }
+                if (formKey.Equals($"giftcard_{product.Id}.Message", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    giftCardMessage = form[formKey];
+                }
+            }
+
+            attributesXml = _productAttributeParser.AddGiftCardAttribute(attributesXml, recipientName, recipientEmail, senderName, senderEmail, giftCardMessage);
         }
 
         #endregion
@@ -183,6 +434,85 @@ namespace Nop.Web.Controllers
             var productTemplateViewPath = _productModelFactory.PrepareProductTemplateViewPath(product);
 
             return View(productTemplateViewPath, model);
+        }
+
+        [PublicAntiForgery]
+        [HttpPost]
+        public virtual IActionResult EstimateShipping([FromQuery] ProductEstimateShippingModel model, IFormCollection form)
+        {
+            if (model == null)
+                return BadRequest();
+            
+            var product = _productService.GetProductById(model.ProductId);
+            if (product == null || product.Deleted || !product.Published)
+                return NotFound();
+
+            var errors = new List<string>();
+
+            if (string.IsNullOrEmpty(model.ZipPostalCode))
+                errors.Add(_localizationService.GetResource("Products.EstimateShipping.ZipPostalCode.Required"));
+
+            if (model.CountryId == null || model.CountryId == 0)
+                errors.Add(_localizationService.GetResource("Products.EstimateShipping.Country.Required"));
+
+            if (errors.Count > 0)
+                return BadRequest(new { Errors = errors });
+
+            var wrappedProduct = new ShoppingCartItem()
+            {
+                StoreId = _storeContext.CurrentStore.Id,
+                ShoppingCartTypeId = (int)ShoppingCartType.ShoppingCart,
+                CustomerId = _workContext.CurrentCustomer.Id,
+                Customer = _workContext.CurrentCustomer,
+                ProductId = product.Id,
+                Product = product,
+                CreatedOnUtc = DateTime.UtcNow
+            };
+
+            //customer entered price
+            if (product.CustomerEntersPrice)
+            {
+                var customerEnteredPriceConverted = decimal.Zero;
+
+                foreach (var formKey in form.Keys)
+                {
+                    if (formKey.Equals($"addtocart_{product.Id}.CustomerEnteredPrice", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        if (decimal.TryParse(form[formKey], out decimal customerEnteredPrice))
+                            customerEnteredPriceConverted = _currencyService.ConvertToPrimaryStoreCurrency(customerEnteredPrice, _workContext.WorkingCurrency);
+                        break;
+                    }
+                }
+
+                wrappedProduct.CustomerEnteredPrice = customerEnteredPriceConverted;
+            }
+
+            //quantity
+            var quantity = 1;
+            foreach (var formKey in form.Keys)
+                if (formKey.Equals($"addtocart_{product.Id}.EnteredQuantity", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    int.TryParse(form[formKey], out quantity);
+                    break;
+                }
+            wrappedProduct.Quantity = quantity;
+
+            var addToCartWarnings = new List<string>();
+
+            //product and gift card attributes
+            wrappedProduct.AttributesXml = ParseProductAttributes(product, form, addToCartWarnings);
+
+            //rental attributes
+            if (product.IsRental)
+            {
+                ParseRentalDates(product, form, out var rentalStartDate, out var rentalEndDate);
+                wrappedProduct.RentalStartDateUtc = rentalStartDate;
+                wrappedProduct.RentalEndDateUtc = rentalEndDate;
+            }
+
+            var modelResult = _shoppingCartModelFactory.PrepareEstimateShippingResultModel(new [] { wrappedProduct }, model.CountryId, model.StateProvinceId, model.ZipPostalCode);
+
+            return Json(modelResult);
         }
 
         #endregion

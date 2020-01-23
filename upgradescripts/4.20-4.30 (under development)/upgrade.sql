@@ -137,6 +137,54 @@ set @resources='
   <LocaleResource Name="Admin.Customers.Customers.Fields.Newsletter.Hint">
     <Value>Choose stores to subscribe to newsletter.</Value>
   </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ChooseShippingTitle">
+    <Value>Shipping Method</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.Country">
+    <Value>Country</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.Country.Required">
+    <Value>Country is required</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.NoSelectedShippingOption">
+    <Value>Please select the address you want to ship from</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.NoShippingOptions">
+    <Value>No shipping options</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.PriceTitle">
+    <Value>Shipping:</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.SelectShippingOption">
+    <Value>Apply</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ShippingOption.Description">
+    <Value>Description</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ShippingOption.Name">
+    <Value>Name</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ShippingOption.Price">
+    <Value>Price</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ShipToTitle">
+    <Value>Ship to</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.StateProvince">
+    <Value>State / province</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ToAddress">
+    <Value>to</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ViaProvider">
+    <Value>via</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ZipPostalCode">
+    <Value>Zip / postal code</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.ZipPostalCode.Required">
+    <Value>Zip / postal code is required</Value>
+  </LocaleResource>
 </Language>
 '
 
