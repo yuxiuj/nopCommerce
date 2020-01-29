@@ -396,7 +396,7 @@ namespace Nop.Services.Plugins
                 var currentCulture = CultureInfo.CurrentCulture;
 
                 //2. Check if there is already an unpacked folder with locales for the current culture in the lib directory, if not then
-                if (!(checkDirectoryExists(NopCommonDefaults.LocalePatternPath, currentCulture.Name) && 
+                if (!(checkDirectoryExists(NopCommonDefaults.LocalePatternPath, currentCulture.Name) || 
                     checkDirectoryExists(NopCommonDefaults.LocalePatternPath, currentCulture.TwoLetterISOLanguageName)))
                 {
                     var cultureToUse = string.Empty;
