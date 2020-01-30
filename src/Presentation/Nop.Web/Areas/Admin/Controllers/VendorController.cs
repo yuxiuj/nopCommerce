@@ -133,7 +133,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var vendorAttributes = _vendorAttributeService.GetAllVendorAttributes();
             foreach (var attribute in vendorAttributes)
             {
-                var controlId = $"{NopVendorsServiceDefaults.Vendor}{attribute.Id}";
+                var controlId = $"{NopVendorsServiceDefaults.VendorAttributePrefix}{attribute.Id}";
                 StringValues ctrlAttributes;
                 switch (attribute.AttributeControlType)
                 {

@@ -219,7 +219,7 @@ namespace Nop.Services.Catalog
             var productAttributes = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
             foreach (var attribute in productAttributes)
             {
-                var controlId = $"{NopCatalogDefaults.Product}{attribute.Id}";
+                var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{attribute.Id}";
                 switch (attribute.AttributeControlType)
                 {
                     case AttributeControlType.DropdownList:
@@ -235,7 +235,7 @@ namespace Nop.Services.Catalog
                                 {
                                     //get quantity entered by customer
                                     var quantity = 1;
-                                    var quantityStr = form[$"{NopCatalogDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
+                                    var quantityStr = form[$"{NopCatalogDefaults.ProductAttributePrefix}{attribute.Id}_{selectedAttributeId}_qty"];
                                     if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                         (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                         errors.Add(_localizationService.GetResource("Products.QuantityShouldBePositive"));
@@ -259,7 +259,7 @@ namespace Nop.Services.Catalog
                                     {
                                         //get quantity entered by customer
                                         var quantity = 1;
-                                        var quantityStr = form[$"{NopCatalogDefaults.Product}{attribute.Id}_{item}_qty"];
+                                        var quantityStr = form[$"{NopCatalogDefaults.ProductAttributePrefix}{attribute.Id}_{item}_qty"];
                                         if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                             (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                             errors.Add(_localizationService.GetResource("Products.QuantityShouldBePositive"));
@@ -282,7 +282,7 @@ namespace Nop.Services.Catalog
                             {
                                 //get quantity entered by customer
                                 var quantity = 1;
-                                var quantityStr = form[$"{NopCatalogDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
+                                var quantityStr = form[$"{NopCatalogDefaults.ProductAttributePrefix}{attribute.Id}_{selectedAttributeId}_qty"];
                                 if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                     (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                     errors.Add(_localizationService.GetResource("Products.QuantityShouldBePositive"));

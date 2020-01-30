@@ -184,7 +184,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var customerAttributes = _customerAttributeService.GetAllCustomerAttributes();
             foreach (var attribute in customerAttributes)
             {
-                var controlId = $"{NopCustomerServiceDefaults.Customer}{attribute.Id}";
+                var controlId = $"{NopCustomerServiceDefaults.CustomerAttributePrefix}{attribute.Id}";
                 StringValues ctrlAttributes;
 
                 switch (attribute.AttributeControlType)

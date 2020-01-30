@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets default prefix for vendor
         /// </summary>
-        public static string Vendor => "vendor_attribute_";
+        public static string VendorAttributePrefix => "vendor_attribute_";
 
         /// <summary>
         /// Gets a key for caching all vendor attributes

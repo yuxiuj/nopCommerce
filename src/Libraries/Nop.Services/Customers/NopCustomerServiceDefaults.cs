@@ -10,7 +10,7 @@
         /// <summary>
         /// Gets default prefix for customer
         /// </summary>
-        public static string Customer => "customer_attribute_";
+        public static string CustomerAttributePrefix => "customer_attribute_";
 
         /// <summary>
         /// Gets a key for caching

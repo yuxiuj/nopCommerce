@@ -208,7 +208,7 @@
         /// <summary>
         /// Gets default prefix for product
         /// </summary>
-        public static string Product => "product_attribute_";
+        public static string ProductAttributePrefix => "product_attribute_";
 
         /// <summary>
         /// Gets a key for caching
