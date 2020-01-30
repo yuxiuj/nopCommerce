@@ -28,6 +28,7 @@ using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
+using Nop.Services.Common;
 
 namespace Nop.Web.Factories
 {
@@ -46,6 +47,7 @@ namespace Nop.Web.Factories
         private readonly ICustomerService _customerService;
         private readonly IDateRangeService _dateRangeService;
         private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IGenericAttributeService _genericAttributeService;
         private readonly IDownloadService _downloadService;
         private readonly ILocalizationService _localizationService;
         private readonly IManufacturerService _manufacturerService;
@@ -84,6 +86,7 @@ namespace Nop.Web.Factories
             ICustomerService customerService,
             IDateRangeService dateRangeService,
             IDateTimeHelper dateTimeHelper,
+            IGenericAttributeService genericAttributeService,
             IDownloadService downloadService,
             ILocalizationService localizationService,
             IManufacturerService manufacturerService,
@@ -118,6 +121,7 @@ namespace Nop.Web.Factories
             _customerService = customerService;
             _dateRangeService = dateRangeService;
             _dateTimeHelper = dateTimeHelper;
+            _genericAttributeService = genericAttributeService;
             _downloadService = downloadService;
             _localizationService = localizationService;
             _manufacturerService = manufacturerService;
@@ -321,7 +325,7 @@ namespace Nop.Web.Factories
                         if (finalPriceWithoutDiscountBase != finalPriceWithDiscountBase)
                             strikeThroughPrice = finalPriceWithoutDiscount;
 
-                        if(strikeThroughPrice > decimal.Zero)
+                        if (strikeThroughPrice > decimal.Zero)
                             priceModel.OldPrice = _priceFormatter.FormatPrice(strikeThroughPrice);
 
                         priceModel.Price = _priceFormatter.FormatPrice(finalPriceWithDiscount);
@@ -413,7 +417,7 @@ namespace Nop.Web.Factories
                     var finalPrice = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceBase, _workContext.WorkingCurrency);
 
                     priceModel.OldPrice = null;
-                    priceModel.Price = string.Format(_localizationService.GetResource("Products.PriceRangeFrom"),_priceFormatter.FormatPrice(finalPrice));
+                    priceModel.Price = string.Format(_localizationService.GetResource("Products.PriceRangeFrom"), _priceFormatter.FormatPrice(finalPrice));
                     priceModel.PriceValue = finalPrice;
 
                     //PAngV default baseprice (used in Germany)
@@ -531,8 +535,8 @@ namespace Nop.Web.Factories
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
 
-            var productTagsCacheKey = string.Format(NopModelCacheDefaults.ProductTagByProductModelKey, 
-                product.Id, 
+            var productTagsCacheKey = string.Format(NopModelCacheDefaults.ProductTagByProductModelKey,
+                product.Id,
                 _workContext.WorkingLanguage.Id,
                 string.Join(",", _workContext.CurrentCustomer.GetCustomerRoleIds()),
                 _storeContext.CurrentStore.Id);
@@ -1411,6 +1415,13 @@ namespace Nop.Web.Factories
                     WrittenOnStr = _dateTimeHelper.ConvertToUserTime(pr.CreatedOnUtc, DateTimeKind.Utc).ToString("g"),
                 };
 
+                if (_customerSettings.AllowCustomersToUploadAvatars)
+                {
+                    productReviewModel.CustomerAvatarUrl = _pictureService.GetPictureUrl(
+                        _genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.AvatarPictureIdAttribute),
+                        _mediaSettings.AvatarPictureSize, _customerSettings.DefaultAvatarEnabled, defaultPictureType: PictureType.Avatar);
+                }
+
                 foreach (var q in _reviewTypeService.GetProductReviewReviewTypeMappingsByProductReviewId(pr.Id))
                 {
                     productReviewModel.AdditionalProductReviewList.Add(new ProductReviewReviewTypeMappingModel
@@ -1428,7 +1439,8 @@ namespace Nop.Web.Factories
 
             foreach (var rt in model.ReviewTypeList)
             {
-                if (model.ReviewTypeList.Count <= model.AddAdditionalProductReviewList.Count) continue;
+                if (model.ReviewTypeList.Count <= model.AddAdditionalProductReviewList.Count)
+                    continue;
                 var reviewType = _reviewTypeService.GetReviewTypeById(rt.Id);
                 var reviewTypeMappingModel = new AddProductReviewReviewTypeMappingModel
                 {
