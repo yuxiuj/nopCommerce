@@ -8,6 +8,11 @@
         #region Customer attributes
 
         /// <summary>
+        /// Gets default prefix for customer
+        /// </summary>
+        public static string Customer => "customer_attribute_";
+
+        /// <summary>
         /// Gets a key for caching
         /// </summary>
         public static string CustomerAttributesAllCacheKey => "Nop.customerattribute.all";

@@ -24,6 +24,13 @@
                         Editable = true,
                         EditType = EditType.Number	 
                     },
+                    new ColumnProperty(nameof(FixedRateModel.TransitDays))
+                    {
+                        Title = T("Plugins.Shipping.FixedByWeightByTotal.Fields.TransitDays").Text,
+                        Width = "200",
+                        Editable = true,
+                        EditType = EditType.Number	 
+                    },
                     new ColumnProperty(nameof(FixedRateModel.ShippingMethodId))
                     {
                         Title = T("Admin.Common.Edit").Text,

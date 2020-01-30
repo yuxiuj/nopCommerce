@@ -94,6 +94,7 @@
             if (!$.magnificPopup.instance.isOpen) {
                 $('#shipping-price-rate').html($('<span/>', { class: 'selected-shipping-loading' }))
                 $('#open-shipping-options').empty();
+                $('#estimated-delivery').empty();
             }
         }
     },
@@ -155,16 +156,18 @@
                         activeOption = {
                             provider: option.Name,
                             price: option.Price,
-                            address: address
+                            address: address,
+                            deliveryDate: option.DeliveryDateFormat
                         };
                     }
-                    self.addShippingOption(option.Name, option.Description, option.Price);
+                    self.addShippingOption(option.Name, option.DeliveryDateFormat, option.Price);
                 });
 
                 if (!activeOption) {
                     activeOption = {
                         provider: options[0].Name,
                         price: options[0].Price,
+                        deliveryDate: options[0].DeliveryDateFormat,
                         address: address
                     };
                 }
@@ -214,6 +217,12 @@
             $('#open-shipping-options')
                 .html($('<span/>').text(`${this.localizedData.ToAddress} ${option.address.countryName}, ${(option.address.stateProvinceName ? option.address.stateProvinceName + ',' : '')} ${option.address.zipPostalCode} ${this.localizedData.ViaProvider} ${option.provider}`))
                 .append($('<i/>', { class: 'arrow-down' }));
+
+            if (option.deliveryDate && option.deliveryDate !== '-') {
+                $('#estimated-delivery').text(`${this.localizedData.EstimatedDeliveryPrefix} ${option.deliveryDate}`);
+            } else {
+                $('#estimated-delivery').empty();
+            }
         } else {
             this.selectedShippingOption = undefined;
 
@@ -222,10 +231,11 @@
             $('#open-shipping-options')
                 .html($('<span/>').text(this.localizedData.NoSelectedShippingOption))
                 .append($('<i/>', { class: 'arrow-down' }));
+            $('#estimated-delivery').empty();
         }
     },
 
-    addShippingOption: function (name, description, price) {
+    addShippingOption: function (name, deliveryDate, price) {
         if (!name || !price) return;
 
         let shippingMethod = $('<div/>', { class: 'estimate-shipping-row shipping-method' });
@@ -235,7 +245,7 @@
                 .append($('<input/>', { type: 'radio', name: 'shipping-option', class: 'estimate-shipping-radio' }))
                 .append($('<label/>')))
             .append($('<div/>', { class: 'estimate-shipping-row-item shipping-item' }).text(name))
-            .append($('<div/>', { class: 'estimate-shipping-row-item shipping-item' }).text(description ? description : '-'))
+            .append($('<div/>', { class: 'estimate-shipping-row-item shipping-item' }).text(deliveryDate ? deliveryDate : '-'))
             .append($('<div/>', { class: 'estimate-shipping-row-item shipping-item' }).text(price));
 
         shippingMethod.on('click', function () {
@@ -250,21 +260,15 @@
     getActiveShippingOption: function () {
         let shippingItems = $('.shipping-item', $('.shipping-method.active'));
         let provider = shippingItems.eq(0).text().trim();
+        let deliveryDate = shippingItems.eq(1).text().trim();
         let price = shippingItems.eq(2).text().trim();
-        let shippingAddress = this.getShippingAddress();
-        if (provider && price && this.addressIsValid(shippingAddress)) {
-            return {
-                provider: provider,
-                price: price,
-                address: {
-                    countryId: shippingAddress.countryId,
-                    countryName: shippingAddress.countryName,
-                    stateProvinceId: shippingAddress.stateProvinceId,
-                    stateProvinceName: shippingAddress.stateProvinceName,
-                    zipPostalCode: shippingAddress.zipPostalCode
-                }
-            };
-        }
+
+        return {
+            provider: provider,
+            price: price,
+            deliveryDate: deliveryDate,
+            address: this.getShippingAddress()
+        };
     },
 
     setActiveShippingOption: function (option) {

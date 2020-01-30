@@ -345,7 +345,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             foreach (var attribute in attributes)
             {
-                var controlId = $"{NopAttributePrefixDefaults.Product}{attribute.Id}";
+                var controlId = $"{NopCatalogDefaults.Product}{attribute.Id}";
                 StringValues ctrlAttributes;
 
                 switch (attribute.AttributeControlType)
@@ -604,7 +604,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 var attribute = _productAttributeService.GetProductAttributeMappingById(model.SelectedProductAttributeId);
                 if (attribute != null)
                 {
-                    var controlId = $"{NopAttributePrefixDefaults.Product}{attribute.Id}";
+                    var controlId = $"{NopCatalogDefaults.Product}{attribute.Id}";
                     switch (attribute.AttributeControlType)
                     {
                         case AttributeControlType.DropdownList:

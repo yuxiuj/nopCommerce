@@ -20,6 +20,7 @@ using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Discounts;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Orders;
@@ -77,6 +78,7 @@ namespace Nop.Plugin.Tax.Avalara.Factories
             ICountryService countryService,
             ICurrencyService currencyService,
             ICustomerService customerService,
+            IDateTimeHelper dateTimeHelper,
             IDiscountService discountService,
             IDownloadService downloadService,
             IGenericAttributeService genericAttributeService,
@@ -123,6 +125,7 @@ namespace Nop.Plugin.Tax.Avalara.Factories
                 countryService,
                 currencyService,
                 customerService,
+                dateTimeHelper,
                 discountService,
                 downloadService,
                 genericAttributeService,

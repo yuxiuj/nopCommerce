@@ -17139,6 +17139,9 @@
   <LocaleResource Name="Products.EstimateShipping.Country.Required">
     <Value>Country is required</Value>
   </LocaleResource>
+  <LocaleResource Name="Products.EstimateShipping.EstimatedDeliveryPrefix">
+    <Value>Estimated Delivery on</Value>
+  </LocaleResource>
   <LocaleResource Name="Products.EstimateShipping.NoSelectedShippingOption">
     <Value>Please select the address you want to ship from</Value>
   </LocaleResource>
@@ -17151,8 +17154,8 @@
   <LocaleResource Name="Products.EstimateShipping.SelectShippingOption">
     <Value>Apply</Value>
   </LocaleResource>
-  <LocaleResource Name="Products.EstimateShipping.ShippingOption.Description">
-    <Value>Description</Value>
+  <LocaleResource Name="Products.EstimateShipping.ShippingOption.EstimatedDelivery">
+    <Value>Estimated Delivery</Value>
   </LocaleResource>
   <LocaleResource Name="Products.EstimateShipping.ShippingOption.Name">
     <Value>Name</Value>
@@ -17294,6 +17297,9 @@
   </LocaleResource>
   <LocaleResource Name="Products.Qty">
     <Value>Qty</Value>
+  </LocaleResource>
+  <LocaleResource Name="Products.QuantityShouldBePositive">
+    <Value>Quantity should be positive</Value>
   </LocaleResource>
   <LocaleResource Name="Products.RecentlyViewedProducts">
     <Value>Recently viewed products</Value>

@@ -8,6 +8,7 @@
         <span id="shipping-price-title">@T("Products.EstimateShipping.PriceTitle")</span><span id="shipping-price-rate"/>
     </div>
     <a href="#shipping-options-popup" id="open-shipping-options" data-effect="product-estimate-shipping-zoom-in"></a>
+    <div id="estimated-delivery"></div>
     <input type="hidden" asp-for="ProductId" />
     <div id="shipping-options-popup" class="white-popup mfp-with-anim mfp-hide">
         <div class="ship-to-title">
@@ -59,7 +60,7 @@
                             @T("Products.EstimateShipping.ShippingOption.Name")
                         </div>
                         <div class="estimate-shipping-row-item shipping-item shipping-header-item">
-                            @T("Products.EstimateShipping.ShippingOption.Description")
+                            @T("Products.EstimateShipping.ShippingOption.EstimatedDelivery")
                         </div>
                         <div class="estimate-shipping-row-item shipping-item shipping-header-item">
                             @T("Products.EstimateShipping.ShippingOption.Price")
@@ -84,6 +85,7 @@
 
     $(document).ready(function () {
         let localizedData = {
+            EstimatedDeliveryPrefix: '@T("Products.EstimateShipping.EstimatedDeliveryPrefix")',
             NoShippingOptions: '@T("Products.EstimateShipping.NoShippingOptions")',
             NoSelectedShippingOption: '@T("Products.EstimateShipping.NoSelectedShippingOption")',
             ToAddress: '@T("Products.EstimateShipping.ToAddress")',

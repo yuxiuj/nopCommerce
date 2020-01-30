@@ -3,7 +3,7 @@
 @using Nop.Core.Domain.Media
 @using System.Text
 @using Nop.Services.Media
-@using Nop.Web.Framework.Controllers;
+@using Nop.Services.Catalog;
 @inject IDownloadService downloadService
 @inject CatalogSettings catalogSettings
 @if (Model.Count > 0)
@@ -12,9 +12,9 @@
         <dl>
             @foreach (var attribute in Model)
             {
-                var controlId = $"{NopAttributePrefixDefaults.Product}{attribute.Id}";
+                var controlId = $"{NopCatalogDefaults.Product}{attribute.Id}";
                 var textPrompt = !string.IsNullOrEmpty(attribute.TextPrompt) ? attribute.TextPrompt : attribute.Name;
-                <dt id="@($"{NopAttributePrefixDefaults.Product}label_{attribute.Id}")">
+                <dt id="@($"{NopCatalogDefaults.Product}label_{attribute.Id}")">
                     <label class="text-prompt">
                         @textPrompt
                     </label>
@@ -29,7 +29,7 @@
                         </div>
                     }
                 </dt>
-                <dd id="@($"{NopAttributePrefixDefaults.Product}input_{attribute.Id}")">
+                <dd id="@($"{NopCatalogDefaults.Product}input_{attribute.Id}")">
                     @switch (attribute.AttributeControlType)
                     {
                         case AttributeControlType.DropdownList:
@@ -371,7 +371,7 @@
         //generate change event script
         foreach (var attribute in Model)
         {
-            var controlId = $"{NopAttributePrefixDefaults.Product}{attribute.Id}";
+            var controlId = $"{NopCatalogDefaults.Product}{attribute.Id}";
             switch (attribute.AttributeControlType)
             {
                 case AttributeControlType.DropdownList:
@@ -446,14 +446,14 @@
                         }
                         if (data.enabledattributemappingids) {
                             for (var i = 0; i < data.enabledattributemappingids.length; i++) {
-                                $('#@(NopAttributePrefixDefaults.Product)label_' + data.enabledattributemappingids[i]).show();
-                                $('#@(NopAttributePrefixDefaults.Product)input_' + data.enabledattributemappingids[i]).show();
+                                $('#@(NopCatalogDefaults.Product)label_' + data.enabledattributemappingids[i]).show();
+                                $('#@(NopCatalogDefaults.Product)input_' + data.enabledattributemappingids[i]).show();
                             }
                         }
                         if (data.disabledattributemappingids) {
                             for (var i = 0; i < data.disabledattributemappingids.length; i++) {
-                                $('#@(NopAttributePrefixDefaults.Product)label_' + data.disabledattributemappingids[i]).hide();
-                                $('#@(NopAttributePrefixDefaults.Product)input_' + data.disabledattributemappingids[i]).hide();
+                                $('#@(NopCatalogDefaults.Product)label_' + data.disabledattributemappingids[i]).hide();
+                                $('#@(NopCatalogDefaults.Product)input_' + data.disabledattributemappingids[i]).hide();
                             }
                         }
                         if (data.pictureDefaultSizeUrl) {

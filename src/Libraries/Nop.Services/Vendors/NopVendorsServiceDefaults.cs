@@ -6,6 +6,11 @@
     public static partial class NopVendorsServiceDefaults
     {
         /// <summary>
+        /// Gets default prefix for vendor
+        /// </summary>
+        public static string Vendor => "vendor_attribute_";
+
+        /// <summary>
         /// Gets a key for caching all vendor attributes
         /// </summary>
         public static string VendorAttributesAllCacheKey => "Nop.vendorattribute.all";

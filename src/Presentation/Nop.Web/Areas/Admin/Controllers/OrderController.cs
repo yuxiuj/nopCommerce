@@ -195,7 +195,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var productAttributes = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
             foreach (var attribute in productAttributes)
             {
-                var controlId = $"{NopAttributePrefixDefaults.Product}{attribute.Id}";
+                var controlId = $"{NopCatalogDefaults.Product}{attribute.Id}";
                 StringValues ctrlAttributes;
 
                 switch (attribute.AttributeControlType)
@@ -212,7 +212,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                             {
                                 //get quantity entered by customer
                                 var quantity = 1;
-                                var quantityStr = form[$"{NopAttributePrefixDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
+                                var quantityStr = form[$"{NopCatalogDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
                                 if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                     (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                     errors.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));
@@ -236,7 +236,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
                                 //get quantity entered by customer
                                 var quantity = 1;
-                                var quantityStr = form[$"{NopAttributePrefixDefaults.Product}{attribute.Id}_{item}_qty"];
+                                var quantityStr = form[$"{NopCatalogDefaults.Product}{attribute.Id}_{item}_qty"];
                                 if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                     (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                     errors.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));
@@ -257,7 +257,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                         {
                             //get quantity entered by customer
                             var quantity = 1;
-                            var quantityStr = form[$"{NopAttributePrefixDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
+                            var quantityStr = form[$"{NopCatalogDefaults.Product}{attribute.Id}_{selectedAttributeId}_qty"];
                             if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                 (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                 errors.Add(_localizationService.GetResource("ShoppingCart.QuantityShouldPositive"));

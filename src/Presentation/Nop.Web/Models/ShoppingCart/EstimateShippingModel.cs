@@ -47,6 +47,8 @@ namespace Nop.Web.Models.ShoppingCart
             public string Description { get; set; }
 
             public string Price { get; set; }
+
+            public string DeliveryDateFormat { get; set; }
         }
 
         #endregion
